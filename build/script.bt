@@ -1,0 +1,88 @@
+#!/usr/bin/env bpftrace
+
+uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
+{
+    if (arg2 == 0x541c)
+    {
+        printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:arg2 == 0x541c, Comm: %s, PID: %d\n", comm, pid);
+        @count_ioctl[comm, pid, arg2] = count();
+        @stack_ioctl[comm, pid, arg2] = ustack;
+    }
+}
+
+
+uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
+{
+    if (((arg1 <= 0) || (arg1 >= 10 && arg1 <= 20) || (arg1 >= 50 && arg1 <= 60) || (arg1 >= 100)) || ((arg2 <= 0) || (arg2 >= 10 && arg2 <= 20) || (arg2 >= 50 && arg2 <= 60) || (arg2 >= 100)))
+    {
+        printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:auto arg1 arg2, Comm: %s, PID: %d\n", comm, pid);
+        @count_ioctl[comm, pid, arg1, arg2] = count();
+        @stack_ioctl[comm, pid, arg1, arg2] = ustack;
+    }
+    @auto_ioctl_arg1[arg1] = count();
+    @auto_ioctl_arg2[arg2] = count();
+}
+
+
+uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate
+{
+    if (arg4 >= 64 && arg4 <= 1024)
+    {
+        printf("/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate:arg4 >= 64 && arg4 <= 1024, Comm: %s, PID: %d\n", comm, pid);
+        @count_EVP_EncryptUpdate[comm, pid, arg4] = count();
+        @stack_EVP_EncryptUpdate[comm, pid, arg4] = ustack;
+    }
+}
+
+
+uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate
+{
+    if (((arg1 <= 0) || (arg1 >= 10 && arg1 <= 20) || (arg1 >= 50 && arg1 <= 60) || (arg1 >= 100)) || ((arg2 <= 0) || (arg2 >= 10 && arg2 <= 20) || (arg2 >= 50 && arg2 <= 60) || (arg2 >= 100)))
+    {
+        printf("/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate:auto arg4 arg5, Comm: %s, PID: %d\n", comm, pid);
+        @count_EVP_EncryptUpdate[comm, pid, arg4, arg5] = count();
+        @stack_EVP_EncryptUpdate[comm, pid, arg4, arg5] = ustack;
+    }
+    @auto_EVP_EncryptUpdate_arg4[arg4] = count();
+    @auto_EVP_EncryptUpdate_arg5[arg5] = count();
+}
+
+
+uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex
+{
+    if (arg2 > 0 && arg2 <= 1024)
+    {
+        printf("/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex:arg2 > 0 && arg2 <= 1024, Comm: %s, PID: %d\n", comm, pid);
+        @count_EVP_EncryptFinal_ex[comm, pid, arg2] = count();
+        @stack_EVP_EncryptFinal_ex[comm, pid, arg2] = ustack;
+    }
+}
+
+
+uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex
+{
+    if (((arg1 <= 0) || (arg1 >= 10 && arg1 <= 20) || (arg1 >= 50 && arg1 <= 60) || (arg1 >= 100)) || ((arg2 <= 0) || (arg2 >= 10 && arg2 <= 20) || (arg2 >= 50 && arg2 <= 60) || (arg2 >= 100)))
+    {
+        printf("/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex:auto arg1, Comm: %s, PID: %d\n", comm, pid);
+        @count_EVP_EncryptFinal_ex[comm, pid, arg1] = count();
+        @stack_EVP_EncryptFinal_ex[comm, pid, arg1] = ustack;
+    }
+    @auto_EVP_EncryptFinal_ex_arg1[arg1] = count();
+}
+
+
+interval:s:5
+{
+    print(@auto_EVP_EncryptFinal_ex_arg1);clear(@auto_EVP_EncryptFinal_ex_arg1);
+    print(@auto_EVP_EncryptUpdate_arg4);clear(@auto_EVP_EncryptUpdate_arg4);
+    print(@auto_EVP_EncryptUpdate_arg5);clear(@auto_EVP_EncryptUpdate_arg5);
+    print(@auto_ioctl_arg1);clear(@auto_ioctl_arg1);
+    print(@auto_ioctl_arg2);clear(@auto_ioctl_arg2);
+    print(@count_EVP_EncryptFinal_ex);clear(@count_EVP_EncryptFinal_ex);
+    print(@count_EVP_EncryptUpdate);clear(@count_EVP_EncryptUpdate);
+    print(@count_ioctl);clear(@count_ioctl);
+    print(@stack_EVP_EncryptFinal_ex);clear(@stack_EVP_EncryptFinal_ex);
+    print(@stack_EVP_EncryptUpdate);clear(@stack_EVP_EncryptUpdate);
+    print(@stack_ioctl);clear(@stack_ioctl);
+    exit();
+}

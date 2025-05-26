@@ -1,0 +1,82 @@
+#!/usr/bin/env bpftrace
+
+
+uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
+/ reg("si") == 0x541c / {
+    printf("Comm: %s, PID: %d, FD: %d, Command: 0x%x, Arg: 0x%lx\n", comm, pid, reg("di"), reg("si"), reg("dx"));
+    // Save the kernel stack trace in the map
+    @sus[comm] = ustack;
+}
+
+
+
+
+
+
+#!/usr/bin/env bpftrace
+
+uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate
+{
+    // Arguments: ctx (rdi), out (rsi), outl (rdx), in (rcx), inl (r8)
+    if (arg4 >= 64 && arg4 <= 1024) {
+        printf("EVP_EncryptUpdate called, inl: %d, Comm: %s, PID: %d\n", arg4, comm, pid);
+        @count[comm, pid, "EVP_EncryptUpdate", arg4] = count();
+        @stack[comm, pid, "EVP_EncryptUpdate", arg4] = ustack;
+    }
+}
+
+uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex
+{
+    // Arguments: ctx (rdi), out (rsi), outl (rdx)
+    if (arg2 > 0 && arg2 <= 1024) {
+        printf("EVP_EncryptFinal_ex called, outl: %d, Comm: %s, PID: %d\n", arg2, comm, pid);
+        @count[comm, pid, "EVP_EncryptFinal_ex", arg2] = count();
+        @stack[comm, pid, "EVP_EncryptFinal_ex", arg2] = ustack;
+    }
+}
+
+uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_DigestUpdate
+{
+    // Arguments: ctx (rdi), data (rsi), cnt (rdx)
+    if (arg2 >= 32 && arg2 <= 2048) {
+        printf("EVP_DigestUpdate called, cnt: %d, Comm: %s, PID: %d\n", arg2, comm, pid);
+        @count[comm, pid, "EVP_DigestUpdate", arg2] = count();
+        @stack[comm, pid, "EVP_DigestUpdate", arg2] = ustack;
+    }
+}
+
+uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:RSA_sign
+{
+    // Arguments: type (rdi), m (rsi), m_len (rdx), sigret (rcx), siglen (r8), rsa (r9)
+    if (arg2 >= 32 && arg2 <= 512) {
+        printf("RSA_sign called, m_len: %d, Comm: %s, PID: %d\n", arg2, comm, pid);
+        @count[comm, pid, "RSA_sign", arg2] = count();
+        @stack[comm, pid, "RSA_sign", arg2] = ustack;
+    }
+}
+
+uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:RSA_verify
+/ (reg("r8") >= 64 && reg("r8") <= 512) /
+{
+    printf("RSA_verify called with siglen: %d, Comm: %s, PID: %d\n", reg("r8"), comm, pid);
+    @sus[comm, pid, "RSA_verify", reg("r8")] = ustack;
+    @count[comm, pid, "RSA_verify", reg("r8")] = count();
+}
+
+interval:s:5 
+{
+    print(@);
+    clear(@);
+    exit();
+}
+
+while true; do
+    sudo bpftrace './script.bt' | tee "bpftrace_traces/trace_$(date +%Y%m%d_%H%M%S).log"
+done
+
+# get histogram of read syscall return values
+@[comm] = hist(args.ret);
+
+while true; do
+    sudo bpftrace -e 'tracepoint:syscalls:sys_exit_read { @[comm] = hist(args.ret); } interval:s:5 { print(@); clear(@); exit(); }' | tee "bpftrace_traces/trace_$(date +%Y%m%d_%H%M%S).log"
+done

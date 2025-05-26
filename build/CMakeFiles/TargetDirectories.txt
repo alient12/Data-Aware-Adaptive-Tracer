@@ -1,0 +1,3 @@
+/mnt/c/Users/AliEntezari/Desktop/Athena Codes/Adaptive_Tracer/build/CMakeFiles/main.dir
+/mnt/c/Users/AliEntezari/Desktop/Athena Codes/Adaptive_Tracer/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/AliEntezari/Desktop/Athena Codes/Adaptive_Tracer/build/CMakeFiles/rebuild_cache.dir
