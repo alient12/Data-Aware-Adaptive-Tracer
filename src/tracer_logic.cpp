@@ -23,3 +23,24 @@ std::vector<std::string> generate_auto_tracer(const std::vector<std::string>& ar
 
     return samplers;
 }
+
+
+size_t Tracer::getId()
+{
+    return this->id;
+}
+
+std::string Tracer::getCountMapName()
+{
+    return countMapName;
+}
+
+std::string Tracer::getStackMapName()
+{
+    return stackMapName;
+}
+
+std::string Tracer::getSamplerMapName()
+{
+    return samplerMapName;
+}

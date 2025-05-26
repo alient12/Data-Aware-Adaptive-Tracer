@@ -55,6 +55,7 @@
         "algorithm": "cpp",
         "set": "cpp",
         "optional": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "map": "cpp"
     }
 }
