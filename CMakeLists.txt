@@ -12,6 +12,7 @@ add_executable(main
     src/yaml_reader.cpp
     src/script_writer.cpp
     src/tracer_logic.cpp
+    src/command.cpp
 )
 target_link_libraries(
     main

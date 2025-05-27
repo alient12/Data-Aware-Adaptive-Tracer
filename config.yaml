@@ -1,6 +1,8 @@
 TraceCondition:
-  Command: python3 program -x -c
+  Command: python3 --version
   admin: False
+  logsDir: ./tracer_logs
+  noExec: False
   Targets:
   - FilePath: /lib/x86_64-linux-gnu/libc.so.6
     Functions:

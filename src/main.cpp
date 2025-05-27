@@ -1,6 +1,7 @@
 #include "yaml_reader.hpp"
 #include "script_writer.hpp"
 #include "tracer_logic.hpp"
+#include "command.hpp"
 #include <iostream>
 #include <string>
 
@@ -58,6 +59,16 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
+
+    CommandRunner runner;
+    FilenameGenerator generator;
+    
+    std::string filename = generator.generateFilename("./tmp");
+    
+    std::cout << "Generated filename: " << filename << std::endl;
+
+    std::string output = runner.runCommandWithRedirect("sudo ls -l", filename);
+    std::cout << "Command Output:\n" << output << std::endl;
 
     return 0;
 }

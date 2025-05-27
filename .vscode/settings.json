@@ -56,6 +56,9 @@
         "set": "cpp",
         "optional": "cpp",
         "xtree": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "chrono": "cpp",
+        "iomanip": "cpp",
+        "filesystem": "cpp"
     }
 }
