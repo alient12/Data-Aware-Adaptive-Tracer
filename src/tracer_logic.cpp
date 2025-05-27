@@ -64,11 +64,11 @@ Tracer::Tracer(TraceDescriptor& td, size_t id)
     for (const auto& arg : args)
     {
         argkeys += ", " + arg;
-        samplerMapNames.push_back("@sampler_" + td.func + "_" + arg);
+        samplerMapNames.push_back("@sampler" + std::to_string((int)id) + "_" + td.func + "_" + arg);
     }
     
-    countMapName = "@count_" + td.func;
-    stackMapName = "@stack_" + td.func;
+    countMapName = "@count" + std::to_string((int)id) + "_" + td.func;
+    stackMapName = "@stack" + std::to_string((int)id) + "_" + td.func;
     this->td = td;
     generate_script();
 }
