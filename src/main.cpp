@@ -20,6 +20,8 @@ int main(int argc, char* argv[]) {
     std::string config_file;
     TraceController tctrl;
     auto traceLine = std::make_shared<std::string>();
+    auto traceMutex = std::make_shared<std::mutex>();
+    auto traceUpdated = std::make_shared<std::atomic<bool>>(false);
 
     // Parse command line arguments
     for (int i = 1; i < argc; ++i) {
@@ -81,7 +83,7 @@ int main(int argc, char* argv[]) {
 
             // Start terminal in separate thread
             std::thread terminalThread([&]() {
-                Terminal terminal(command, traceLine);
+                Terminal terminal(command, traceLine, traceMutex, traceUpdated);
                 terminal.start();
             });
 
@@ -89,7 +91,11 @@ int main(int argc, char* argv[]) {
             CommandRunner runner;
             while (true) {
                 std::string output = runner.runBPFtrace(logsDir, scriptPath, sudo);
-                *traceLine = output.substr(0, 50);  // Shorten if needed
+                {
+                    std::lock_guard<std::mutex> lock(*traceMutex);
+                    *traceLine = "[BPFtrace]:| " + output.substr(0, 50);
+                    *traceUpdated = true;
+                }
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }
 
