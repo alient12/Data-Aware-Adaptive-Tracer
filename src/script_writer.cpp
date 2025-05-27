@@ -25,8 +25,6 @@ std::string generate_interval(const size_t& t, TraceController& tctrl)
 
 std::string generate_bpftrace_script(YamlReader& reader, TraceController& tctrl)
 {
-    std::cout << "Command: " << reader.getCommand() << std::endl;
-
     std::string script;
     script += "#!/usr/bin/env bpftrace\n\n";
 

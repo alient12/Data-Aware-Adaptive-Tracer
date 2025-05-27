@@ -201,6 +201,30 @@ src/script_writer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/script_writer.cpp.s
 .PHONY : src/script_writer.cpp.s
 
+src/terminal.o: src/terminal.cpp.o
+.PHONY : src/terminal.o
+
+# target to build an object file
+src/terminal.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/terminal.cpp.o
+.PHONY : src/terminal.cpp.o
+
+src/terminal.i: src/terminal.cpp.i
+.PHONY : src/terminal.i
+
+# target to preprocess a source file
+src/terminal.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/terminal.cpp.i
+.PHONY : src/terminal.cpp.i
+
+src/terminal.s: src/terminal.cpp.s
+.PHONY : src/terminal.s
+
+# target to generate assembly for a file
+src/terminal.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/terminal.cpp.s
+.PHONY : src/terminal.cpp.s
+
 src/tracer_logic.o: src/tracer_logic.cpp.o
 .PHONY : src/tracer_logic.o
 
@@ -267,6 +291,9 @@ help:
 	@echo "... src/script_writer.o"
 	@echo "... src/script_writer.i"
 	@echo "... src/script_writer.s"
+	@echo "... src/terminal.o"
+	@echo "... src/terminal.i"
+	@echo "... src/terminal.s"
 	@echo "... src/tracer_logic.o"
 	@echo "... src/tracer_logic.i"
 	@echo "... src/tracer_logic.s"

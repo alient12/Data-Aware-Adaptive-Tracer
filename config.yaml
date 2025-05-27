@@ -1,8 +1,9 @@
 TraceCondition:
-  Command: python3 --version
-  admin: False
-  logsDir: ./tracer_logs
-  noExec: False
+  Command: python3
+  Sudo: True
+  NoExec: False
+  LogsDir: ./tracer_logs
+  ScriptPath: ./script.bt
   Targets:
   - FilePath: /lib/x86_64-linux-gnu/libc.so.6
     Functions:

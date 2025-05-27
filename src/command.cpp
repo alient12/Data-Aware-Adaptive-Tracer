@@ -4,12 +4,12 @@
 #include <cstdio>
 #include <memory>
 #include <csignal>
-#include <unistd.h>
 #include <iomanip>
 #include <sstream>
 #include <chrono>
 #include <ctime>
 #include <filesystem>
+
 
 std::string FilenameGenerator::generateFilename(const std::string& basePath) {
     namespace fs = std::filesystem; // Use filesystem namespace
@@ -40,40 +40,38 @@ std::string FilenameGenerator::generateFilename(const std::string& basePath) {
 }
 
 
-
-// Capture output directly using popen()
-std::string CommandRunner::runCommandDirectly(const std::string& command) {
+// Run command, redirect output to a file, then read the file
+std::string CommandRunner::runCommandWithRedirect(const std::string& command, const std::string& filename, const bool& sudo)
+{
     std::string result;
-    char buffer[128];
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
-    
-    if (!pipe) {
-        throw std::runtime_error("popen() failed!");
+    std::string fullCommand = command + " > " + filename;
+    if (sudo)
+    fullCommand = "sudo " + fullCommand;
+    std::system(fullCommand.c_str());
+
+    std::ifstream file(filename);
+    if (!file)
+    {
+        throw std::runtime_error("Failed to open output file.");
     }
 
-    while (fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) {
-        result += buffer;
+    std::string line;
+    while (std::getline(file, line))
+    {
+        result += line + "\n";
     }
 
     return result;
 }
 
-// Run command, redirect output to a file, then read the file
-std::string CommandRunner::runCommandWithRedirect(const std::string& command, const std::string& filename) {
+std::string CommandRunner::runBPFtrace(const std::string& dir, const std::string& scriptPath, const bool& sudo)
+{
     std::string result;
-    std::string fullCommand = command + " > " + filename;
-    std::system(fullCommand.c_str());
+    std::string filename{fngen.generateFilename(dir)};
 
-    std::ifstream file(filename);
-    if (!file) {
-        throw std::runtime_error("Failed to open output file.");
-    }
-
-    std::string line;
-    while (std::getline(file, line)) {
-        result += line + "\n";
-    }
-
+    // std::string command = "bpftrace " + scriptPath;
+    std::string command = "head -n 1 " + scriptPath;
+    result = runCommandWithRedirect(command, filename, sudo);
     return result;
 }
 

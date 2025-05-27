@@ -4,12 +4,38 @@
 
 YamlReader::YamlReader(const std::string& filename) : filename(filename) {}
 
-std::string YamlReader::getCommand() const {
+std::string YamlReader::getCommand() const
+{
     YAML::Node config = YAML::LoadFile(filename);
     return config["TraceCondition"]["Command"].as<std::string>();
 }
 
-std::vector<TraceDescriptor> YamlReader::getTracers() const {
+bool YamlReader::getSudo() const
+{
+    YAML::Node config = YAML::LoadFile(filename);
+    return config["TraceCondition"]["Sudo"].as<bool>();
+}
+
+bool YamlReader::getNoExec() const
+{
+    YAML::Node config = YAML::LoadFile(filename);
+    return config["TraceCondition"]["NoExec"].as<bool>();
+}
+
+std::string YamlReader::getLogsDir() const
+{
+    YAML::Node config = YAML::LoadFile(filename);
+    return config["TraceCondition"]["LogsDir"].as<std::string>();
+}
+
+std::string YamlReader::getScriptPath() const
+{
+    YAML::Node config = YAML::LoadFile(filename);
+    return config["TraceCondition"]["ScriptPath"].as<std::string>();
+}
+
+std::vector<TraceDescriptor> YamlReader::getTracers() const
+{
     YAML::Node config = YAML::LoadFile(filename);
     std::vector<TraceDescriptor> tracers;
 

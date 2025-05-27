@@ -1,9 +1,11 @@
 #include "yaml_reader.hpp"
 #include "script_writer.hpp"
 #include "tracer_logic.hpp"
+#include "terminal.hpp"
 #include "command.hpp"
 #include <iostream>
 #include <string>
+#include <thread>
 
 
 void print_usage(const std::string& program_name) {
@@ -42,33 +44,43 @@ int main(int argc, char* argv[]) {
 
     try {
         YamlReader reader(config_file);
+        auto command{reader.getCommand()};
+        auto sudo{reader.getSudo()};
+        auto logsDir{reader.getLogsDir()};
+        auto noExec{reader.getNoExec()};
+        auto scriptPath{reader.getScriptPath()};
+
         auto script = generate_bpftrace_script(reader, tctrl);
-        write_bpftrace_script(script, "./script.bt");
+        write_bpftrace_script(script, scriptPath);
 
-        // std::cout << "FilePath: " << reader.getFilePath() << std::endl;
+        if (!noExec)
+        {
+            CommandRunner runner;
 
-        // auto triggers = reader.getTriggers();
-        // for (const auto& t : triggers) {
-        //     std::cout << "Function: " << t.func << std::endl;
-        //     std::cout << "Triggers:" << std::endl;
-        //     for (const auto& trig : t.trigers) {
-        //         std::cout << "- " << trig << std::endl;
-        //     }
-        // }
+            // Start the first command in a separate thread
+            std::thread commandThread([&]()
+            {
+                Terminal terminal(command);
+                terminal.start();
+            });
+
+            // Run BPFtrace in a loop
+            while (true) {
+                std::string traceOutput = runner.runBPFtrace(logsDir, scriptPath, sudo);
+                // std::cout << "BPFtrace Output:\n" << traceOutput << std::endl;
+
+                // Optional: control execution frequency
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+
+            // Detach the command thread so it runs independently
+            commandThread.detach();
+        }
+
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
-
-    CommandRunner runner;
-    FilenameGenerator generator;
-    
-    std::string filename = generator.generateFilename("./tmp");
-    
-    std::cout << "Generated filename: " << filename << std::endl;
-
-    std::string output = runner.runCommandWithRedirect("sudo ls -l", filename);
-    std::cout << "Command Output:\n" << output << std::endl;
 
     return 0;
 }

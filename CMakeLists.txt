@@ -13,6 +13,7 @@ add_executable(main
     src/script_writer.cpp
     src/tracer_logic.cpp
     src/command.cpp
+    src/terminal.cpp
 )
 target_link_libraries(
     main

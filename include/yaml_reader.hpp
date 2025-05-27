@@ -27,6 +27,10 @@ class YamlReader {
     public:
     explicit YamlReader(const std::string& filename);
     std::string getCommand() const;
+    std::string getLogsDir() const;
+    std::string getScriptPath() const;
+    bool getSudo() const;
+    bool getNoExec() const;
     std::vector<TraceDescriptor> getTracers() const;
     
     private:
