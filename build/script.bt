@@ -19,8 +19,8 @@ uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
         @count_ioctl[comm, pid, arg1, arg2] = count();
         @stack_ioctl[comm, pid, arg1, arg2] = ustack;
     }
-    @auto_ioctl_arg1[arg1] = count();
-    @auto_ioctl_arg2[arg2] = count();
+    @sampler_ioctl_arg1[arg1] = count();
+    @sampler_ioctl_arg2[arg2] = count();
 }
 
 
@@ -43,8 +43,8 @@ uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate
         @count_EVP_EncryptUpdate[comm, pid, arg4, arg5] = count();
         @stack_EVP_EncryptUpdate[comm, pid, arg4, arg5] = ustack;
     }
-    @auto_EVP_EncryptUpdate_arg4[arg4] = count();
-    @auto_EVP_EncryptUpdate_arg5[arg5] = count();
+    @sampler_EVP_EncryptUpdate_arg4[arg4] = count();
+    @sampler_EVP_EncryptUpdate_arg5[arg5] = count();
 }
 
 
@@ -67,22 +67,22 @@ uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex
         @count_EVP_EncryptFinal_ex[comm, pid, arg1] = count();
         @stack_EVP_EncryptFinal_ex[comm, pid, arg1] = ustack;
     }
-    @auto_EVP_EncryptFinal_ex_arg1[arg1] = count();
+    @sampler_EVP_EncryptFinal_ex_arg1[arg1] = count();
 }
 
 
 interval:s:5
 {
-    print(@auto_EVP_EncryptFinal_ex_arg1);clear(@auto_EVP_EncryptFinal_ex_arg1);
-    print(@auto_EVP_EncryptUpdate_arg4);clear(@auto_EVP_EncryptUpdate_arg4);
-    print(@auto_EVP_EncryptUpdate_arg5);clear(@auto_EVP_EncryptUpdate_arg5);
-    print(@auto_ioctl_arg1);clear(@auto_ioctl_arg1);
-    print(@auto_ioctl_arg2);clear(@auto_ioctl_arg2);
     print(@count_EVP_EncryptFinal_ex);clear(@count_EVP_EncryptFinal_ex);
     print(@count_EVP_EncryptUpdate);clear(@count_EVP_EncryptUpdate);
     print(@count_ioctl);clear(@count_ioctl);
     print(@stack_EVP_EncryptFinal_ex);clear(@stack_EVP_EncryptFinal_ex);
     print(@stack_EVP_EncryptUpdate);clear(@stack_EVP_EncryptUpdate);
     print(@stack_ioctl);clear(@stack_ioctl);
+    print(@sampler_EVP_EncryptFinal_ex_arg1);clear(@sampler_EVP_EncryptFinal_ex_arg1);
+    print(@sampler_EVP_EncryptUpdate_arg4);clear(@sampler_EVP_EncryptUpdate_arg4);
+    print(@sampler_EVP_EncryptUpdate_arg5);clear(@sampler_EVP_EncryptUpdate_arg5);
+    print(@sampler_ioctl_arg1);clear(@sampler_ioctl_arg1);
+    print(@sampler_ioctl_arg2);clear(@sampler_ioctl_arg2);
     exit();
 }

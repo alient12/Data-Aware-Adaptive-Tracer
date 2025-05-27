@@ -1,5 +1,6 @@
 #include "yaml_reader.hpp"
 #include "script_writer.hpp"
+#include "tracer_logic.hpp"
 #include <iostream>
 #include <string>
 
@@ -13,6 +14,7 @@ void print_usage(const std::string& program_name) {
 
 int main(int argc, char* argv[]) {
     std::string config_file;
+    TraceController tctrl;
 
     // Parse command line arguments
     for (int i = 1; i < argc; ++i) {
@@ -39,7 +41,7 @@ int main(int argc, char* argv[]) {
 
     try {
         YamlReader reader(config_file);
-        auto script = generate_bpftrace_script(reader);
+        auto script = generate_bpftrace_script(reader, tctrl);
         write_bpftrace_script(script, "./script.bt");
 
         // std::cout << "FilePath: " << reader.getFilePath() << std::endl;

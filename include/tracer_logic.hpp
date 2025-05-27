@@ -6,10 +6,11 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <regex>
+#include <algorithm>
 
-extern std::set<std::string> maps;
-
-std::vector<std::string> generate_auto_tracer(const std::vector<std::string>& args, TraceDescriptor& t);
+std::string string_multiplier(std::string s, size_t r);
+std::vector<std::string> findVars(const std::string& str);
 
 enum class TracerType
 {
@@ -24,27 +25,57 @@ enum class TracerType
 class Tracer
 {
     public:
+    Tracer() = default;
+    Tracer(TraceDescriptor& td, size_t id);
     size_t getId();
     std::string getCountMapName();
     std::string getStackMapName();
-    std::string getSamplerMapName();
-    std::string getTriggerScript();
+    std::vector<std::string> getSamplerMapNames();
+    // std::string getTriggerScript();
+    TracerType getType();
+    std::string getScript();
+    void setEnable(bool b);
+
+    // Move Constructor
+    Tracer(Tracer&& other) noexcept;
     
     private:
     bool isEnabled;
-    const size_t id;
-    const TracerType type;
-    const std::string name;
-    const std::string countMapName;
-    const std::string stackMapName;
-    const std::string samplerMapName;
+    size_t id;
+    TracerType type;
+    std::string countMapName;
+    std::string stackMapName;
+    std::vector<std::string> samplerMapNames;
+    TraceDescriptor td;
+    std::string script;
+
+    std::vector<std::string> args;
+    std::string argkeys;
+
+    std::vector<std::string> triggers;
+    std::string triggerScript;
+
+    void generate_script();
+    void generate_auto_triggers();
     
 };
 
 class TraceController
 {
+    public:
+    TraceController() = default;
+    Tracer* addTracer(TraceDescriptor& td);
+    Tracer* getTracerById(size_t& id);
+    const std::set<std::string>& getStackMapNames();
+    const std::set<std::string>& getCountMapNames();
+    const std::set<std::string>& getSamplerMapNames();
+    
     private:
+    size_t tracerCounter{};
     std::map<size_t, Tracer> tracers;
+    std::set<std::string> stackMapNames;
+    std::set<std::string> countMapNames;
+    std::set<std::string> samplerMapNames;
 };
 
 #endif

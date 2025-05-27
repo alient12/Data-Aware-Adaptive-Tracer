@@ -6,16 +6,9 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <set>
-#include <regex>
-#include <algorithm>
 
-std::string string_multiplier(std::string s, size_t r);
-std::vector<std::string> findVars(const std::string& str);
-
-std::string generate_bpftrace_script(YamlReader& reader);
-std::string generate_interval(size_t t);
-std::string generate_tracer(TraceDescriptor& t);
+std::string generate_bpftrace_script(YamlReader& reader, TraceController& tctrl);
+std::string generate_interval(const size_t& t, TraceController& tctrl);
 
 void write_bpftrace_script(const std::string& script, const std::string& filename);
 
