@@ -6,8 +6,8 @@
 #include <fcntl.h>
 #include <algorithm>
 
-Terminal::Terminal(const std::string& cmd) 
-    : command(cmd), master_fd(-1), child_pid(-1), interactive_mode(false) {}
+Terminal::Terminal(const std::string& cmd, std::shared_ptr<std::string> trace)
+    : command(cmd), master_fd(-1), child_pid(-1), interactive_mode(false), traceLine(trace) {}
 
 Terminal::~Terminal() {
     disableRawMode();
@@ -41,10 +41,24 @@ void Terminal::processUserCommand(const std::string& input) {
     }
 }
 
+void Terminal::printTraceLine() {
+    // Get terminal size
+    struct winsize ws;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
+    int bottom_row = ws.ws_row;
+
+    // Move cursor to bottom, clear line, print trace
+    std::cout << "\0337";                        // Save cursor position
+    std::cout << "\033[" << bottom_row << ";1H"; // Move to bottom row
+    std::cout << "\033[2K";                      // Clear line
+    std::cout << "BPFtrace: " << *traceLine << std::flush;
+    std::cout << "\0338";                        // Restore cursor position
+}
 void Terminal::terminalLoop() {
     char buffer[256];
     fd_set readfds;
     std::string input_buffer;
+    std::string lastTraceLine;
 
     while (true) {
         FD_ZERO(&readfds);
@@ -55,7 +69,6 @@ void Terminal::terminalLoop() {
         int ret = select(maxfd, &readfds, nullptr, nullptr, nullptr);
 
         if (ret > 0) {
-            // Child output
             if (FD_ISSET(master_fd, &readfds)) {
                 ssize_t count = read(master_fd, buffer, sizeof(buffer));
                 if (count > 0) {
@@ -65,12 +78,10 @@ void Terminal::terminalLoop() {
                 }
             }
 
-            // User input
             if (FD_ISSET(STDIN_FILENO, &readfds)) {
                 ssize_t count = read(STDIN_FILENO, buffer, sizeof(buffer));
                 if (count > 0) {
                     if (interactive_mode) {
-                        // ESC disables interactive mode
                         if (count == 1 && buffer[0] == 0x1B) {
                             interactive_mode = false;
                             disableRawMode();
@@ -96,6 +107,15 @@ void Terminal::terminalLoop() {
                 }
             }
         }
+
+        // Only update trace line if it has changed
+        std::string currentTrace = *traceLine;
+        if (currentTrace != lastTraceLine) {
+            lastTraceLine = currentTrace;
+            printTraceLine();  // Refresh only on change
+        }
+
+        usleep(50000);  // Small delay
     }
 }
 

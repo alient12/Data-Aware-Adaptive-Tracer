@@ -63,6 +63,8 @@
         "csignal": "cpp",
         "forward_list": "cpp",
         "ratio": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "stop_token": "cpp",
+        "thread": "cpp"
     }
 }

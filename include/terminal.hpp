@@ -3,13 +3,14 @@
 
 #include <string>
 #include <termios.h>
+#include <atomic>
+#include <memory>
 
 class Terminal {
 public:
-    Terminal(const std::string& command);
+    Terminal(const std::string& command, std::shared_ptr<std::string> traceLine);
     ~Terminal();
 
-    // Start the terminal session
     void start();
 
 private:
@@ -18,16 +19,13 @@ private:
     pid_t child_pid;
     struct termios orig_termios;
     bool interactive_mode;
+    std::shared_ptr<std::string> traceLine;  // Reference to the shared trace line
 
-    // Set raw mode on stdin
     void enableRawMode();
-    // Restore original terminal settings
     void disableRawMode();
-    // Process special user commands (e.g., :i, :q)
     void processUserCommand(const std::string& input);
-
-    // Core loop for managing input/output
     void terminalLoop();
+    void printTraceLine();  // New
 };
 
 #endif

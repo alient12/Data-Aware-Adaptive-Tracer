@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <memory>
 
 
 void print_usage(const std::string& program_name) {
@@ -18,6 +19,7 @@ void print_usage(const std::string& program_name) {
 int main(int argc, char* argv[]) {
     std::string config_file;
     TraceController tctrl;
+    auto traceLine = std::make_shared<std::string>();
 
     // Parse command line arguments
     for (int i = 1; i < argc; ++i) {
@@ -53,28 +55,45 @@ int main(int argc, char* argv[]) {
         auto script = generate_bpftrace_script(reader, tctrl);
         write_bpftrace_script(script, scriptPath);
 
+
         if (!noExec)
         {
-            CommandRunner runner;
+            // CommandRunner runner;
 
-            // Start the first command in a separate thread
-            std::thread commandThread([&]()
-            {
-                Terminal terminal(command);
+            // // Start the first command in a separate thread
+            // std::thread commandThread([&]()
+            // {
+            //     Terminal terminal(command);
+            //     terminal.start();
+            // });
+
+            // // Run BPFtrace in a loop
+            // while (true) {
+            //     std::string traceOutput = runner.runBPFtrace(logsDir, scriptPath, sudo);
+            //     // std::cout << "BPFtrace Output:\n" << traceOutput << std::endl;
+
+            //     // Optional: control execution frequency
+            //     std::this_thread::sleep_for(std::chrono::seconds(1));
+            // }
+
+            // // Detach the command thread so it runs independently
+            // commandThread.detach();
+
+            // Start terminal in separate thread
+            std::thread terminalThread([&]() {
+                Terminal terminal(command, traceLine);
                 terminal.start();
             });
 
-            // Run BPFtrace in a loop
+            // Run BPFtrace in main thread
+            CommandRunner runner;
             while (true) {
-                std::string traceOutput = runner.runBPFtrace(logsDir, scriptPath, sudo);
-                // std::cout << "BPFtrace Output:\n" << traceOutput << std::endl;
-
-                // Optional: control execution frequency
+                std::string output = runner.runBPFtrace(logsDir, scriptPath, sudo);
+                *traceLine = output.substr(0, 50);  // Shorten if needed
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }
 
-            // Detach the command thread so it runs independently
-            commandThread.detach();
+            terminalThread.join();
         }
 
     } catch (const std::exception& e) {
