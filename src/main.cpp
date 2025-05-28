@@ -72,7 +72,8 @@ int main(int argc, char* argv[]) {
                 std::string output = runner.runBPFtrace(logsDir, scriptPath, sudo);
                 {
                     std::lock_guard<std::mutex> lock(*traceMutex);
-                    *traceLine = "[BPFtrace] |" + output.substr(0, 50);
+                    // *traceLine = "[BPFtrace] |" + output.substr(0, 50);
+                    *traceLine = "[BPFtrace] | updated threholds";
                     *traceUpdated = true;
                 }
                 std::this_thread::sleep_for(std::chrono::seconds(1));

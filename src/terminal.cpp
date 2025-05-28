@@ -20,9 +20,6 @@ traceLine(trace), traceMutex(mtx), traceUpdated(updated), terminate(term) {}
 Terminal::~Terminal() {
     if (master_fd >= 0) close(master_fd);
     if (child_pid > 0) waitpid(child_pid, nullptr, 0);
-    disableRawMode();
-    std::cout << "\033[0m" << std::endl;
-    std::cout << "\033[2K" << std::endl;
 }
 
 void Terminal::enableRawMode() {
@@ -36,49 +33,49 @@ void Terminal::disableRawMode() {
     tcsetattr(STDIN_FILENO, TCSANOW, &orig_termios);
 }
 
-void Terminal::processUserCommand(const std::string& input) {
-    if (input == ":i") {
-        if (!interactive_mode) {
-            interactive_mode = true;
-            enableRawMode();
-            std::lock_guard<std::mutex> lock(*traceMutex);
-            *traceLine = "Interactive mode enabled";
-            *traceUpdated = true;
-        }
-    // } else if (input == ":q") {
-    //     std::lock_guard<std::mutex> lock(*traceMutex);
-    //     // *traceLine = "Exiting terminal session...";
-    //     // *traceUpdated = true;
-    //     // flushTraceBuffer();
-    //     // printTraceLine();
-    //     *terminate = true;  // Signal the loop to exit
-    //     std::cout << "Exiting terminal session...\n";
+// void Terminal::processUserCommand(const std::string& input) {
+//     if (input == ":i") {
+//         if (!interactive_mode) {
+//             interactive_mode = true;
+//             enableRawMode();
+//             std::lock_guard<std::mutex> lock(*traceMutex);
+//             *traceLine = "Interactive mode enabled";
+//             *traceUpdated = true;
+//         }
+//     // } else if (input == ":q") {
+//     //     std::lock_guard<std::mutex> lock(*traceMutex);
+//     //     *traceLine = "Exiting terminal session...";
+//     //     *traceUpdated = true;
+//     //     flushTraceBuffer();
+//     //     printTraceLine();
+//     //     *terminate = true;  // Signal the loop to exit
+//     //     std::cout << "Exiting terminal session...\n";
     
-    //     if (child_pid > 0) {
-    //         kill(-child_pid, SIGTERM);
-    //         usleep(100000);  // Give it a moment to terminate
-    //         if (waitpid(child_pid, nullptr, WNOHANG) == 0) {
-    //             // If child hasn't exited, send SIGHUP or SIGKILL
-    //             kill(-child_pid, SIGHUP);
-    //             usleep(100000);
-    //             if (waitpid(child_pid, nullptr, WNOHANG) == 0) {
-    //                 kill(-child_pid, SIGKILL);
-    //             }
-    //         }
-    //         waitpid(child_pid, nullptr, 0);
-    //     }
+//     //     if (child_pid > 0) {
+//     //         kill(-child_pid, SIGTERM);
+//     //         usleep(100000);  // Give it a moment to terminate
+//     //         if (waitpid(child_pid, nullptr, WNOHANG) == 0) {
+//     //             // If child hasn't exited, send SIGHUP or SIGKILL
+//     //             kill(-child_pid, SIGHUP);
+//     //             usleep(100000);
+//     //             if (waitpid(child_pid, nullptr, WNOHANG) == 0) {
+//     //                 kill(-child_pid, SIGKILL);
+//     //             }
+//     //         }
+//     //         waitpid(child_pid, nullptr, 0);
+//     //     }
     
-    //     if (master_fd >= 0) {
-    //         close(master_fd);  // Force close PTY to unblock select/read
-    //     }
+//     //     if (master_fd >= 0) {
+//     //         close(master_fd);  // Force close PTY to unblock select/read
+//     //     }
     
-    //     std::cout << "Terminal session exited cleanly.\n";
-    } else {
-        std::lock_guard<std::mutex> lock(*traceMutex);
-        *traceLine = "Unknown command: " + input;
-        *traceUpdated = true;
-    }
-}
+//     //     std::cout << "Terminal session exited cleanly.\n";
+//     } else {
+//         std::lock_guard<std::mutex> lock(*traceMutex);
+//         *traceLine = "Unknown command: " + input;
+//         *traceUpdated = true;
+//     }
+// }
 
 void Terminal::printTraceLine() {
     std::lock_guard<std::mutex> lock(*traceMutex);
@@ -104,10 +101,10 @@ void Terminal::printTraceLine() {
     std::cout << "\033[2K";
     std::cout << statusPart;
     if (!bpftracePart.empty()) {
-        std::cout << " | \033[36m" << bpftracePart << "\033[0m";
+        std::cout << ": \033[36m" << bpftracePart << "\033[0m";
     }
     std::cout << std::flush;
-    std::cout << "\0338";
+    std::cout << "\0338\n";
 }
 
 void Terminal::flushTraceBuffer() {
@@ -135,47 +132,47 @@ void Terminal::terminalLoop() {
         struct timeval timeout = {0, 100000};  // 100ms
         int ret = select(maxfd, &readfds, nullptr, nullptr, &timeout);
 
-        if (ret > 0) {
-            if (FD_ISSET(master_fd, &readfds)) {
-                ssize_t count = read(master_fd, buffer, sizeof(buffer));
-                if (count > 0) {
-                    write(STDOUT_FILENO, buffer, count);
-                } else {
-                    *terminate = true;  // Child exited, signal shutdown
-                    break;
-                }
-            }
+        // if (ret > 0) {
+        //     if (FD_ISSET(master_fd, &readfds)) {
+        //         ssize_t count = read(master_fd, buffer, sizeof(buffer));
+        //         if (count > 0) {
+        //             write(STDOUT_FILENO, buffer, count);
+        //         } else {
+        //             *terminate = true;  // Child exited, signal shutdown
+        //             break;
+        //         }
+        //     }
 
-            if (FD_ISSET(STDIN_FILENO, &readfds)) {
-                ssize_t count = read(STDIN_FILENO, buffer, sizeof(buffer));
-                if (count > 0) {
-                    if (interactive_mode) {
-                        if (count == 1 && buffer[0] == 0x1B) {
-                            interactive_mode = false;
-                            disableRawMode();
-                            std::lock_guard<std::mutex> lock(*traceMutex);
-                            *traceLine = "Interactive mode disabled";
-                            *traceUpdated = true;
-                        } else {
-                            write(master_fd, buffer, count);
-                        }
-                    } else {
-                        input_buffer.append(buffer, count);
-                        size_t pos;
-                        while ((pos = input_buffer.find('\n')) != std::string::npos) {
-                            std::string line = input_buffer.substr(0, pos);
-                            input_buffer.erase(0, pos + 1);
-                            if (!line.empty() && line[0] == ':') {
-                                processUserCommand(line);
-                            }
-                        }
-                    }
-                } else {
-                    *terminate = true;  // stdin closed (e.g. Ctrl+D), signal shutdown
-                    break;
-                }
-            }
-        }
+        //     if (FD_ISSET(STDIN_FILENO, &readfds)) {
+        //         ssize_t count = read(STDIN_FILENO, buffer, sizeof(buffer));
+        //         if (count > 0) {
+        //             if (interactive_mode) {
+        //                 if (count == 1 && buffer[0] == 0x1B) {
+        //                     interactive_mode = false;
+        //                     disableRawMode();
+        //                     std::lock_guard<std::mutex> lock(*traceMutex);
+        //                     *traceLine = "Interactive mode disabled";
+        //                     *traceUpdated = true;
+        //                 } else {
+        //                     write(master_fd, buffer, count);
+        //                 }
+        //             } else {
+        //                 input_buffer.append(buffer, count);
+        //                 size_t pos;
+        //                 while ((pos = input_buffer.find('\n')) != std::string::npos) {
+        //                     std::string line = input_buffer.substr(0, pos);
+        //                     input_buffer.erase(0, pos + 1);
+        //                     if (!line.empty() && line[0] == ':') {
+        //                         processUserCommand(line);
+        //                     }
+        //                 }
+        //             }
+        //         } else {
+        //             *terminate = true;  // stdin closed (e.g. Ctrl+D), signal shutdown
+        //             break;
+        //         }
+        //     }
+        // }
 
         // Check for trace update
         if (traceUpdated && traceUpdated->exchange(false)) {
@@ -206,7 +203,7 @@ void Terminal::start() {
         _exit(1);
     } else {
         std::cout << "Terminal started for command: " << command << "\n";
-        std::cout << "Enter ':' commands (e.g., :i for interactive, :q to quit).\n";
+        // std::cout << "Enter ':' commands (e.g., :i for interactive, :q to quit).\n";
         terminalLoop();
     }
 }
