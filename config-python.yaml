@@ -1,5 +1,5 @@
 TraceCondition:
-  Command: /home/alient/Codes/eunomia-bpf-examples/ioctl-hook/ioctl_bug
+  Command: python3
   Sudo: True
   NoExec: False
   LogsDir: ./tracer_logs

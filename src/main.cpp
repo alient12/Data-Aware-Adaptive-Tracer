@@ -78,12 +78,12 @@ int main(int argc, char* argv[]) {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }
         
-            std::cout << "BPFtrace runner exiting.\n";
+            std::cout << "BPFtrace runner exiting." << std::endl;
             if (terminalThread.joinable())
             {
                 terminalThread.join();
             }
-            std::cout << "Application exited cleanly.\n";
+            std::cout << "Application exited cleanly." << std::endl;
         }
 
     } catch (const std::exception& e) {

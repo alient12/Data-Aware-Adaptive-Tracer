@@ -1,4 +1,4 @@
-#include "Terminal.hpp"
+#include "terminal.hpp"
 #include <iostream>
 #include <unistd.h>
 #include <pty.h>
@@ -18,9 +18,11 @@ traceLine(trace), traceMutex(mtx), traceUpdated(updated), terminate(term) {}
 
 
 Terminal::~Terminal() {
-    disableRawMode();
     if (master_fd >= 0) close(master_fd);
     if (child_pid > 0) waitpid(child_pid, nullptr, 0);
+    disableRawMode();
+    std::cout << "\033[0m" << std::endl;
+    std::cout << "\033[2K" << std::endl;
 }
 
 void Terminal::enableRawMode() {

@@ -69,8 +69,8 @@ std::string CommandRunner::runBPFtrace(const std::string& dir, const std::string
     std::string result;
     std::string filename{fngen.generateFilename(dir)};
 
-    // std::string command = "bpftrace " + scriptPath;
-    std::string command = "head -n 1 " + scriptPath;
+    std::string command = "bpftrace " + scriptPath;
+    // std::string command = "head -n 1 " + scriptPath;
     result = runCommandWithRedirect(command, filename, sudo);
     return result;
 }
