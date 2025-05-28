@@ -5,14 +5,15 @@
 #include <termios.h>
 #include <memory>
 #include <mutex>
-#include <atomic>  // NEW
+#include <atomic>
 
 class Terminal {
 public:
     Terminal(const std::string& command,
              std::shared_ptr<std::string> traceLine,
              std::shared_ptr<std::mutex> traceMutex,
-             std::shared_ptr<std::atomic<bool>> traceUpdated);  // UPDATED
+             std::shared_ptr<std::atomic<bool>> traceUpdated,
+             std::shared_ptr<std::atomic<bool>> terminate);
     ~Terminal();
 
     void start();
@@ -23,15 +24,18 @@ private:
     pid_t child_pid;
     struct termios orig_termios;
     bool interactive_mode;
+    std::string traceBuffer;  // NEW: buffer for trace lines during interactive mode
 
     std::shared_ptr<std::string> traceLine;
     std::shared_ptr<std::mutex> traceMutex;
-    std::shared_ptr<std::atomic<bool>> traceUpdated;  // NEW
+    std::shared_ptr<std::atomic<bool>> traceUpdated;
+    std::shared_ptr<std::atomic<bool>> terminate;
 
     void enableRawMode();
     void disableRawMode();
     void processUserCommand(const std::string& input);
     void printTraceLine();
+    void flushTraceBuffer();  // NEW
     void terminalLoop();
 };
 

@@ -6,13 +6,16 @@
 #include <fcntl.h>
 #include <algorithm>
 #include <sys/ioctl.h>
+#include <signal.h>
 
 Terminal::Terminal(const std::string& cmd,
-                   std::shared_ptr<std::string> trace,
-                   std::shared_ptr<std::mutex> mtx,
-                   std::shared_ptr<std::atomic<bool>> updated)  // UPDATED
-    : command(cmd), master_fd(-1), child_pid(-1), interactive_mode(false),
-      traceLine(trace), traceMutex(mtx), traceUpdated(updated) {}  // UPDATED
+    std::shared_ptr<std::string> trace,
+    std::shared_ptr<std::mutex> mtx,
+    std::shared_ptr<std::atomic<bool>> updated,
+    std::shared_ptr<std::atomic<bool>> term)
+: command(cmd), master_fd(-1), child_pid(-1), interactive_mode(false),
+traceLine(trace), traceMutex(mtx), traceUpdated(updated), terminate(term) {}
+
 
 Terminal::~Terminal() {
     disableRawMode();
@@ -38,28 +41,57 @@ void Terminal::processUserCommand(const std::string& input) {
             enableRawMode();
             std::lock_guard<std::mutex> lock(*traceMutex);
             *traceLine = "Interactive mode enabled";
-            *traceUpdated = true;  // Signal update
+            *traceUpdated = true;
         }
-    } else if (input == ":q") {
-        std::lock_guard<std::mutex> lock(*traceMutex);
-        *traceLine = "Exiting terminal session...";
-        *traceUpdated = true;  // Signal update
-        printTraceLine();
-        exit(0);
+    // } else if (input == ":q") {
+    //     std::lock_guard<std::mutex> lock(*traceMutex);
+    //     // *traceLine = "Exiting terminal session...";
+    //     // *traceUpdated = true;
+    //     // flushTraceBuffer();
+    //     // printTraceLine();
+    //     *terminate = true;  // Signal the loop to exit
+    //     std::cout << "Exiting terminal session...\n";
+    
+    //     if (child_pid > 0) {
+    //         kill(-child_pid, SIGTERM);
+    //         usleep(100000);  // Give it a moment to terminate
+    //         if (waitpid(child_pid, nullptr, WNOHANG) == 0) {
+    //             // If child hasn't exited, send SIGHUP or SIGKILL
+    //             kill(-child_pid, SIGHUP);
+    //             usleep(100000);
+    //             if (waitpid(child_pid, nullptr, WNOHANG) == 0) {
+    //                 kill(-child_pid, SIGKILL);
+    //             }
+    //         }
+    //         waitpid(child_pid, nullptr, 0);
+    //     }
+    
+    //     if (master_fd >= 0) {
+    //         close(master_fd);  // Force close PTY to unblock select/read
+    //     }
+    
+    //     std::cout << "Terminal session exited cleanly.\n";
     } else {
         std::lock_guard<std::mutex> lock(*traceMutex);
         *traceLine = "Unknown command: " + input;
-        *traceUpdated = true;  // Signal update
+        *traceUpdated = true;
     }
 }
 
 void Terminal::printTraceLine() {
+    std::lock_guard<std::mutex> lock(*traceMutex);
+    std::string line = *traceLine;
+
+    if (interactive_mode) {
+        // Append line to buffer instead of printing
+        traceBuffer += line + "\n";
+        return;
+    }
+
+    // Print line normally at bottom
     struct winsize ws;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
     int bottom_row = ws.ws_row;
-
-    std::lock_guard<std::mutex> lock(*traceMutex);
-    std::string line = *traceLine;
 
     size_t sepPos = line.find("|");
     std::string statusPart = (sepPos != std::string::npos) ? line.substr(0, sepPos) : line;
@@ -76,12 +108,23 @@ void Terminal::printTraceLine() {
     std::cout << "\0338";
 }
 
+void Terminal::flushTraceBuffer() {
+    if (!traceBuffer.empty()) {
+        std::cout << "\n--- Trace Buffer ---\n";
+        std::cout << traceBuffer;
+        std::cout << "--- End of Trace Buffer ---\n";
+        traceBuffer.clear();
+    }
+}
+
 void Terminal::terminalLoop() {
     char buffer[256];
     fd_set readfds;
     std::string input_buffer;
 
-    while (true) {
+    bool was_interactive = interactive_mode;
+
+    while (!terminate->load()) {  // Check for termination signal
         FD_ZERO(&readfds);
         FD_SET(master_fd, &readfds);
         FD_SET(STDIN_FILENO, &readfds);
@@ -96,6 +139,7 @@ void Terminal::terminalLoop() {
                 if (count > 0) {
                     write(STDOUT_FILENO, buffer, count);
                 } else {
+                    *terminate = true;  // Child exited, signal shutdown
                     break;
                 }
             }
@@ -125,17 +169,27 @@ void Terminal::terminalLoop() {
                         }
                     }
                 } else {
+                    *terminate = true;  // stdin closed (e.g. Ctrl+D), signal shutdown
                     break;
                 }
             }
         }
 
-        // Check the traceUpdated flag
+        // Check for trace update
         if (traceUpdated && traceUpdated->exchange(false)) {
             printTraceLine();
         }
+
+        // If interactive mode was active and now disabled, flush the buffer
+        if (was_interactive && !interactive_mode) {
+            flushTraceBuffer();
+        }
+
+        was_interactive = interactive_mode;
     }
 }
+
+
 
 void Terminal::start() {
     child_pid = forkpty(&master_fd, nullptr, nullptr, nullptr);

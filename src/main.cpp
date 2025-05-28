@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
     auto traceLine = std::make_shared<std::string>();
     auto traceMutex = std::make_shared<std::mutex>();
     auto traceUpdated = std::make_shared<std::atomic<bool>>(false);
+    auto terminate = std::make_shared<std::atomic<bool>>(false);
 
     // Parse command line arguments
     for (int i = 1; i < argc; ++i) {
@@ -60,46 +61,29 @@ int main(int argc, char* argv[]) {
 
         if (!noExec)
         {
-            // CommandRunner runner;
-
-            // // Start the first command in a separate thread
-            // std::thread commandThread([&]()
-            // {
-            //     Terminal terminal(command);
-            //     terminal.start();
-            // });
-
-            // // Run BPFtrace in a loop
-            // while (true) {
-            //     std::string traceOutput = runner.runBPFtrace(logsDir, scriptPath, sudo);
-            //     // std::cout << "BPFtrace Output:\n" << traceOutput << std::endl;
-
-            //     // Optional: control execution frequency
-            //     std::this_thread::sleep_for(std::chrono::seconds(1));
-            // }
-
-            // // Detach the command thread so it runs independently
-            // commandThread.detach();
-
-            // Start terminal in separate thread
             std::thread terminalThread([&]() {
-                Terminal terminal(command, traceLine, traceMutex, traceUpdated);
+                Terminal terminal(command, traceLine, traceMutex, traceUpdated, terminate);
                 terminal.start();
             });
 
             // Run BPFtrace in main thread
             CommandRunner runner;
-            while (true) {
+            while (!terminate->load()) {  // Check termination condition
                 std::string output = runner.runBPFtrace(logsDir, scriptPath, sudo);
                 {
                     std::lock_guard<std::mutex> lock(*traceMutex);
-                    *traceLine = "[BPFtrace]:| " + output.substr(0, 50);
+                    *traceLine = "[BPFtrace] |" + output.substr(0, 50);
                     *traceUpdated = true;
                 }
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }
-
-            terminalThread.join();
+        
+            std::cout << "BPFtrace runner exiting.\n";
+            if (terminalThread.joinable())
+            {
+                terminalThread.join();
+            }
+            std::cout << "Application exited cleanly.\n";
         }
 
     } catch (const std::exception& e) {
