@@ -41,8 +41,8 @@ TraceCondition:
       - Func: ioctl
         HookType: uprobe
         Triggers:
-          - arg2 == 0x541c
-          - auto arg1 arg2
+          - arg0 == 0x541c
+          - auto arg0 arg2
   - FilePath: /lib/x86_64-linux-gnu/libcrypto.so.3
     Functions:
       - Func: EVP_EncryptUpdate
