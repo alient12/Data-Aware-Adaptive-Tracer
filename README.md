@@ -32,7 +32,7 @@ Example `config.yaml`:
 TraceCondition:
   Command: /home/user/program_under_test -a -b -c
   Sudo: True
-  NoExec: True
+  NoExec: False
   LogsDir: ./tracer_logs
   ScriptPath: ./script.bt
   Targets:
