@@ -20,14 +20,14 @@ void print_usage(const std::string& program_name) {
 
 int main(int argc, char* argv[]) {
     std::string config_file;
-    TraceController tctrl;
+    LogParser parser;
+    DistributionCalculator distCalc;
+    TraceController tctrl(distCalc);
     auto traceLine = std::make_shared<std::string>();
     auto traceMutex = std::make_shared<std::mutex>();
     auto traceUpdated = std::make_shared<std::atomic<bool>>(false);
     auto terminate = std::make_shared<std::atomic<bool>>(false);
 
-    LogParser parser;
-    DistributionCalculator calculator;
 
     // Parse command line arguments
     for (int i = 1; i < argc; ++i) {
@@ -63,7 +63,6 @@ int main(int argc, char* argv[]) {
         auto script = generate_bpftrace_script(reader, tctrl);
         write_bpftrace_script(script, scriptPath);
 
-
         if (!noExec)
         {
             std::thread terminalThread([&]() {
@@ -76,13 +75,19 @@ int main(int argc, char* argv[]) {
             while (!terminate->load()) {  // Check termination condition
                 std::string output = runner.runBPFtrace(logsDir, scriptPath, sudo);
                 {
-                    std::lock_guard<std::mutex> lock(*traceMutex);
+                    // std::lock_guard<std::mutex> lock(*traceMutex);
                     // *traceLine = "[BPFtrace] |" + output.substr(0, 50);
                     parser.parseFromString(output);
-                    calculator.computeDistribution(parser.getSamplerArgMap());
-                    std::string rareArgCondition = calculator.generateRareArgCondition(1, "ioctl", 1);
-                    *traceLine = "[BPFtrace] | updated threholds";
-                    *traceUpdated = true;
+                    distCalc.computeDistribution(parser.getSamplerArgMap());
+                    int changed = tctrl.regenerateAllAutoTriggers();tctrl.regenerateAllAutoTriggers();
+
+                    if (changed)
+                    {
+                        // *traceLine = "[BPFtrace]|updated threholds";
+                        // *traceUpdated = true;
+                        script = tctrl.generateScript();
+                        write_bpftrace_script(script, scriptPath, true);
+                    }
                 }
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }
@@ -103,10 +108,10 @@ int main(int argc, char* argv[]) {
     // parser.parseFromFile("./tracer_logs/trace_20250528_222900.log");
     // parser.printResults();
 
-    // calculator.computeDistribution(parser.getSamplerArgMap());
-    // calculator.printDistributions();
+    // distCalc.computeDistribution(parser.getSamplerArgMap());
+    // distCalc.printDistributions();
 
-    // std::string rareArgCondition = calculator.generateRareArgCondition(1, "ioctl", 1);
+    // std::string rareArgCondition = distCalc.generateRareArgCondition(1, "ioctl", 1);
     // std::cout << "Rare condition: " << rareArgCondition << std::endl;
 
 

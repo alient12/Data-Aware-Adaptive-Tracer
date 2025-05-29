@@ -1,28 +1,5 @@
 #include "script_writer.hpp"
 
-std::string generate_interval(const size_t& t, TraceController& tctrl)
-{
-    std::string s;
-    std::string ind4{string_multiplier(" ", 4)};
-    s += "interval:s:" + std::to_string((int)t) + "\n";
-    s += "{\n";
-    for (const auto& map: tctrl.getCountMapNames())
-    {
-        s += ind4 + "print(" + map + ");clear(" + map + ");\n";
-    }
-    for (const auto& map: tctrl.getStackMapNames())
-    {
-        s += ind4 + "print(" + map + ");clear(" + map + ");\n";
-    }
-    for (const auto& map: tctrl.getSamplerMapNames())
-    {
-        s += ind4 + "print(" + map + ");clear(" + map + ");\n";
-    }
-    s += ind4 + "exit();\n";
-    s += "}\n";
-    return s;
-}
-
 std::string generate_bpftrace_script(YamlReader& reader, TraceController& tctrl)
 {
     std::string script;
@@ -35,19 +12,37 @@ std::string generate_bpftrace_script(YamlReader& reader, TraceController& tctrl)
         script += tp->getScript();
     }
 
-    script += generate_interval(5, tctrl);
+    script += tctrl.generateInterval(5);
 
     return script;
 }
 
-void write_bpftrace_script(const std::string& script, const std::string& filename)
+void write_bpftrace_script(const std::string& script, const std::string& filename, const bool& isUpdate)
 {
     std::ofstream file(filename);
     if (file.is_open()) 
     {
         file << script;
         file.close();
-        std::cout << "Script written to " << filename << std::endl;
+
+        // Get current time
+        auto now = std::chrono::system_clock::now();
+        std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+        std::tm* now_tm = std::localtime(&now_c);
+        
+        if (isUpdate)
+        {
+            std::cout << "\033[36m" << "[BPFtrace]" << "\033[0m "
+            << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S")
+            << ": updated threholds in " << filename << std::endl;
+        }
+        else
+        {
+            std::cout << "\033[36m" << "[BPFtrace]" << "\033[0m "
+            << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S")
+            << ": Script written to " << filename << std::endl;
+        }
+
     } 
     else 
     {

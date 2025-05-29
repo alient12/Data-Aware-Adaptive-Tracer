@@ -13,7 +13,7 @@ uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 
 uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 {
-    if (((arg1 <= 0) || (arg1 >= 10 && arg1 <= 20) || (arg1 >= 50 && arg1 <= 60) || (arg1 >= 100)) || ((arg2 <= 0) || (arg2 >= 10 && arg2 <= 20) || (arg2 >= 50 && arg2 <= 60) || (arg2 >= 100)))
+    if (((arg1 >= 2901007449 && arg1 <= 3223340586)) || ((arg2 >= 112589985009868 && arg2 <= 126663733136101)))
     {
         printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:auto arg1 arg2, Comm: %s, PID: %d\n", comm, pid);
         @count1_ioctl[comm, pid, arg1, arg2] = count();
@@ -37,7 +37,7 @@ uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate
 
 uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate
 {
-    if (((arg1 <= 0) || (arg1 >= 10 && arg1 <= 20) || (arg1 >= 50 && arg1 <= 60) || (arg1 >= 100)) || ((arg2 <= 0) || (arg2 >= 10 && arg2 <= 20) || (arg2 >= 50 && arg2 <= 60) || (arg2 >= 100)))
+    if (true)
     {
         printf("/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate:auto arg4 arg5, Comm: %s, PID: %d\n", comm, pid);
         @count3_EVP_EncryptUpdate[comm, pid, arg4, arg5] = count();
@@ -61,7 +61,7 @@ uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex
 
 uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex
 {
-    if (((arg1 <= 0) || (arg1 >= 10 && arg1 <= 20) || (arg1 >= 50 && arg1 <= 60) || (arg1 >= 100)) || ((arg2 <= 0) || (arg2 >= 10 && arg2 <= 20) || (arg2 >= 50 && arg2 <= 60) || (arg2 >= 100)))
+    if (true)
     {
         printf("/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex:auto arg1, Comm: %s, PID: %d\n", comm, pid);
         @count5_EVP_EncryptFinal_ex[comm, pid, arg1] = count();

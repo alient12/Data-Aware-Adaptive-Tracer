@@ -34,47 +34,40 @@ std::vector<std::string> findVars(const std::string& str)
 }
 
 
-Tracer::Tracer(TraceDescriptor& td, size_t id)
+Tracer::Tracer(TraceDescriptor& td, size_t id, DistributionCalculator& dc)
+    : td(td), id(id), distCalc(dc)  // Initialize reference
 {
-    this->id = id;
     isEnabled = true;
-    if (td.trigger.rfind("auto", 0) == 0)
-    {
+    if (td.trigger.rfind("auto", 0) == 0) {
         type = TracerType::AUTO;
         generate_auto_triggers();
-    } else if (td.trigger.rfind("cpu", 0) == 0)
-    {
+    } else if (td.trigger.rfind("cpu", 0) == 0) {
         type = TracerType::CPU;
-    } else if (td.trigger.rfind("disk", 0) == 0)
-    {
+    } else if (td.trigger.rfind("disk", 0) == 0) {
         type = TracerType::DISK;
-    } else if (td.trigger.rfind("memory", 0) == 0)
-    {
+    } else if (td.trigger.rfind("memory", 0) == 0) {
         type = TracerType::MEMORY;
-    } else if (td.trigger.rfind("network", 0) == 0)
-    {
+    } else if (td.trigger.rfind("network", 0) == 0) {
         type = TracerType::NETWORK;
-    } else
-    {
+    } else {
         type = TracerType::MANUAL;
         triggerScript = td.trigger;
     }
 
     args = findVars(td.trigger);
-    for (const auto& arg : args)
-    {
+    for (const auto& arg : args) {
         argkeys += ", " + arg;
         samplerMapNames.push_back("@sampler" + std::to_string((int)id) + "_" + td.func + "_" + arg);
     }
-    
+
     countMapName = "@count" + std::to_string((int)id) + "_" + td.func;
     stackMapName = "@stack" + std::to_string((int)id) + "_" + td.func;
-    this->td = td;
+
     generate_script();
 }
 
 Tracer::Tracer(Tracer&& other) noexcept
-    : td(other.td), // Reference remains the same
+    : td(other.td), // Copy as references remain valid
       id(other.id),
       isEnabled(other.isEnabled),
       type(std::move(other.type)),
@@ -85,7 +78,8 @@ Tracer::Tracer(Tracer&& other) noexcept
       args(std::move(other.args)),
       argkeys(std::move(other.argkeys)),
       triggers(std::move(other.triggers)),
-      triggerScript(std::move(other.triggerScript)) {}
+      triggerScript(std::move(other.triggerScript)),
+      distCalc(other.distCalc) {}
 
 
 size_t Tracer::getId()
@@ -113,7 +107,7 @@ TracerType Tracer::getType()
     return type;
 }
 
-std::string Tracer::getScript()
+std::string Tracer::getScript() const
 {
     return script;
 }
@@ -150,31 +144,55 @@ void Tracer::generate_script()
     script += "\n\n";
 }
 
-void Tracer::generate_auto_triggers()
-{
-    // temporary code
-    triggers.push_back("(arg1 <= 0) || (arg1 >= 10 && arg1 <= 20) || (arg1 >= 50 && arg1 <= 60) || (arg1 >= 100)");
-    triggers.push_back("(arg2 <= 0) || (arg2 >= 10 && arg2 <= 20) || (arg2 >= 50 && arg2 <= 60) || (arg2 >= 100)");
-    
-    triggerScript = "";
-    for (size_t i{}; i < triggers.size(); i++)
-    {
-        if (i)
-        triggerScript += " || ";
-        triggerScript += "(" + triggers[i] + ")";
+bool Tracer::generate_auto_triggers() {
+    triggers.clear();
+
+    for (const std::string& arg : args) {
+        int argNumber = std::stoi(arg.substr(3));
+        std::string rareCondition = distCalc.generateRareArgCondition(static_cast<int>(id), td.func, argNumber);
+        if (!rareCondition.empty()) {
+            triggers.push_back(rareCondition);
+        }
     }
+
+    std::string oldTriggerScript = triggerScript;
+
+    if (triggers.empty()) {
+        triggerScript = "true";
+    } else {
+        triggerScript.clear();
+        for (size_t i = 0; i < triggers.size(); ++i) {
+            if (i > 0) triggerScript += " || ";
+            triggerScript += "(" + triggers[i] + ")";
+        }
+    }
+
+    bool changed = (triggerScript != oldTriggerScript);
+
+    if (changed) {
+        // Get current time
+        auto now = std::chrono::system_clock::now();
+        std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+        std::tm* now_tm = std::localtime(&now_c);
+    
+        std::cout << "\033[36m" << "[BPFtrace]" << "\033[0m "
+                  << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S")
+                  << ": Tracer ID " << id << " updated with trigger condition: "
+                  << triggerScript << std::endl;
+    
+        generate_script();  // Regenerate script only if changed
+    }
+
+    return changed;
 }
 
 
-Tracer* TraceController::addTracer(TraceDescriptor& td)
-{
-    Tracer t{td, tracerCounter};  // Create Tracer instance
-    auto [it, inserted] = tracers.insert({tracerCounter++, std::move(t)}); // Move into map
+Tracer* TraceController::addTracer(TraceDescriptor& td) {
+    Tracer t(td, tracerCounter, distCalc);  // Pass distCalc reference
+    auto [it, inserted] = tracers.insert({tracerCounter++, std::move(t)});
 
     if (inserted) {
-        Tracer* tracerPtr = &it->second;  // Get pointer to newly inserted Tracer
-
-        // Update other sets
+        Tracer* tracerPtr = &it->second;
         stackMapNames.insert(tracerPtr->getStackMapName());
         countMapNames.insert(tracerPtr->getCountMapName());
 
@@ -184,10 +202,10 @@ Tracer* TraceController::addTracer(TraceDescriptor& td)
             }
         }
 
-        return tracerPtr;  // Return pointer to the added Tracer
+        return tracerPtr;
     }
 
-    return nullptr;  // Return nullptr if insertion fails
+    return nullptr;
 }
 
 Tracer* TraceController::getTracerById(size_t& id)
@@ -209,4 +227,55 @@ const std::set<std::string>& TraceController::getCountMapNames()
 const std::set<std::string>& TraceController::getSamplerMapNames()
 {
     return samplerMapNames;
+}
+
+int TraceController::regenerateAllAutoTriggers() {
+    bool anyChanged = false;
+
+    for (auto& [id, tracer] : tracers) {
+        if (tracer.getType() == TracerType::AUTO) {
+            bool changed = tracer.generate_auto_triggers();
+            if (changed) {
+                anyChanged = true;
+            }
+        }
+    }
+
+    return anyChanged ? 1 : 0;
+}
+
+std::string TraceController::generateInterval(const size_t& t)
+{
+    std::string s;
+    std::string ind4{string_multiplier(" ", 4)};
+    s += "interval:s:" + std::to_string((int)t) + "\n";
+    s += "{\n";
+
+    for (const auto& map: countMapNames) {
+        s += ind4 + "print(" + map + ");clear(" + map + ");\n";
+    }
+    for (const auto& map: stackMapNames) {
+        s += ind4 + "print(" + map + ");clear(" + map + ");\n";
+    }
+    for (const auto& map: samplerMapNames) {
+        s += ind4 + "print(" + map + ");clear(" + map + ");\n";
+    }
+
+    s += ind4 + "exit();\n";
+    s += "}\n";
+    return s;
+}
+
+std::string TraceController::generateScript()
+{
+    std::string script;
+    script += "#!/usr/bin/env bpftrace\n\n";
+
+    for (const auto& [id, tracer] : tracers) {
+        script += tracer.getScript();
+    }
+
+    script += generateInterval(5);
+
+    return script;
 }
