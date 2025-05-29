@@ -30,7 +30,7 @@ BPFNexus **automatically converts this configuration into a valid BPFtrace scrip
 Example `config.yaml`:
 ```yaml
 TraceCondition:
-  Command: /home/alient/Codes/eunomia-bpf-examples/ioctl-hook/ioctl_bug
+  Command: /home/user/program_under_test -a -b -c
   Sudo: True
   NoExec: True
   LogsDir: ./tracer_logs
@@ -57,3 +57,36 @@ TraceCondition:
           - auto arg1
           # - cpu
           # - disk
+
+### 2️⃣ Run the BPFNexus Binary
+```bash
+sudo ./bpfnexus --config config.yaml
+```
+
+BPFNexus will:
+- Launch `/home/user/program_under_test -a -b -c` under tracing.
+- Generate a BPFtrace script at `./script.bt`.
+- Apply triggers as defined, including **adaptive auto triggers** based on data patterns or system metrics.
+- Store logs in `./tracer_logs`.
+
+### 3️⃣ Adaptive Tracing
+- Use `auto argX` triggers in your YAML to enable **data-driven adaptive tracing** for specific arguments.
+- BPFNexus dynamically updates the script as it identifies rare values or other patterns.
+- Future support for additional algorithms (e.g., system health, machine learning) is planned.
+
+---
+
+## 🔮 Future Roadmap
+- **Custom algorithms** beyond distribution-based adaptive triggers.
+- **Machine learning-based anomaly detection** integration.
+- **Advanced system health monitoring** modules (CPU, disk, memory, network).
+- **Visualization tools** for real-time trace analytics.
+
+---
+
+## 📜 License
+[MIT License]
+
+---
+
+### 🏆 BPFNexus: Connect Your Tracing Strategy
