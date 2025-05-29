@@ -1,7 +1,7 @@
 TraceCondition:
-  Command: /home/alient/Codes/eunomia-bpf-examples/ioctl-hook/ioctl_bug
+  Command: bash -c 'while true; do /home/alient/Codes/eunomia-bpf-examples/ioctl-hook/ioctl_bug; sleep 1; done'
   Sudo: True
-  NoExec: True
+  NoExec: False
   LogsDir: ./tracer_logs
   ScriptPath: ./script.bt
   Targets:
