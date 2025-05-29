@@ -57,6 +57,7 @@ TraceCondition:
           - auto arg1
           # - cpu
           # - disk
+```
 
 ### 2️⃣ Run the BPFNexus Binary
 ```bash
