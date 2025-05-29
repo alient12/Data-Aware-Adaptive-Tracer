@@ -13,7 +13,7 @@ uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 
 uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 {
-    if (((arg1 >= 2901007449 && arg1 <= 3223340586)) || ((arg2 >= 112589985009868 && arg2 <= 126663733136101)))
+    if (((arg1 >= 939762695 && arg1 <= 1074013192)) || ((arg2 >= 0 && arg2 <= 17591343850984)))
     {
         printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:auto arg1 arg2, Comm: %s, PID: %d\n", comm, pid);
         @count1_ioctl[comm, pid, arg1, arg2] = count();

@@ -32,13 +32,13 @@ void write_bpftrace_script(const std::string& script, const std::string& filenam
         
         if (isUpdate)
         {
-            std::cout << "\033[36m" << "[BPFtrace]" << "\033[0m "
+            std::cout << "\033[36m" << "[BPFNexus]" << "\033[0m "
             << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S")
             << ": updated threholds in " << filename << std::endl;
         }
         else
         {
-            std::cout << "\033[36m" << "[BPFtrace]" << "\033[0m "
+            std::cout << "\033[36m" << "[BPFNexus]" << "\033[0m "
             << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S")
             << ": Script written to " << filename << std::endl;
         }

@@ -175,7 +175,7 @@ bool Tracer::generate_auto_triggers() {
         std::time_t now_c = std::chrono::system_clock::to_time_t(now);
         std::tm* now_tm = std::localtime(&now_c);
     
-        std::cout << "\033[36m" << "[BPFtrace]" << "\033[0m "
+        std::cout << "\033[36m" << "[BPFNexus]" << "\033[0m "
                   << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S")
                   << ": Tracer ID " << id << " updated with trigger condition: "
                   << triggerScript << std::endl;
