@@ -2,25 +2,25 @@
 
 uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 {
-    if (arg2 == 0x541c)
+    if (arg1 == 0x541c)
     {
-        printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:arg2 == 0x541c, Comm: %s, PID: %d\n", comm, pid);
-        @count0_ioctl[comm, pid, arg2] = count();
-        @stack0_ioctl[comm, pid, arg2] = ustack;
+        printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:arg1 == 0x541c, Comm: %s, PID: %d\n", comm, pid);
+        @count0_ioctl[comm, pid, arg1] = count();
+        @stack0_ioctl[comm, pid, arg1] = ustack;
     }
 }
 
 
 uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 {
-    if (((arg1 >= 939762695 && arg1 <= 1074013192)) || ((arg2 >= 0 && arg2 <= 17591928141656)))
+    if (((arg0 >= 3988183916 && arg0 <= 4294967295)) || ((arg1 >= 963503307 && arg1 <= 1204376829)))
     {
-        printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:auto arg1 arg2, Comm: %s, PID: %d\n", comm, pid);
-        @count1_ioctl[comm, pid, arg1, arg2] = count();
-        @stack1_ioctl[comm, pid, arg1, arg2] = ustack;
+        printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:auto arg0 arg1, Comm: %s, PID: %d\n", comm, pid);
+        @count1_ioctl[comm, pid, arg0, arg1] = count();
+        @stack1_ioctl[comm, pid, arg0, arg1] = ustack;
     }
+    @sampler1_ioctl_arg0[arg0] = count();
     @sampler1_ioctl_arg1[arg1] = count();
-    @sampler1_ioctl_arg2[arg2] = count();
 }
 
 
@@ -85,8 +85,8 @@ interval:s:5
     print(@stack3_EVP_EncryptUpdate);clear(@stack3_EVP_EncryptUpdate);
     print(@stack4_EVP_EncryptFinal_ex);clear(@stack4_EVP_EncryptFinal_ex);
     print(@stack5_EVP_EncryptFinal_ex);clear(@stack5_EVP_EncryptFinal_ex);
+    print(@sampler1_ioctl_arg0);clear(@sampler1_ioctl_arg0);
     print(@sampler1_ioctl_arg1);clear(@sampler1_ioctl_arg1);
-    print(@sampler1_ioctl_arg2);clear(@sampler1_ioctl_arg2);
     print(@sampler3_EVP_EncryptUpdate_arg4);clear(@sampler3_EVP_EncryptUpdate_arg4);
     print(@sampler3_EVP_EncryptUpdate_arg5);clear(@sampler3_EVP_EncryptUpdate_arg5);
     print(@sampler5_EVP_EncryptFinal_ex_arg1);clear(@sampler5_EVP_EncryptFinal_ex_arg1);
