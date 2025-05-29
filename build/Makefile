@@ -129,6 +129,30 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
+src/bpflog_reader.o: src/bpflog_reader.cpp.o
+.PHONY : src/bpflog_reader.o
+
+# target to build an object file
+src/bpflog_reader.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/bpflog_reader.cpp.o
+.PHONY : src/bpflog_reader.cpp.o
+
+src/bpflog_reader.i: src/bpflog_reader.cpp.i
+.PHONY : src/bpflog_reader.i
+
+# target to preprocess a source file
+src/bpflog_reader.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/bpflog_reader.cpp.i
+.PHONY : src/bpflog_reader.cpp.i
+
+src/bpflog_reader.s: src/bpflog_reader.cpp.s
+.PHONY : src/bpflog_reader.s
+
+# target to generate assembly for a file
+src/bpflog_reader.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/bpflog_reader.cpp.s
+.PHONY : src/bpflog_reader.cpp.s
+
 src/command.o: src/command.cpp.o
 .PHONY : src/command.o
 
@@ -152,6 +176,30 @@ src/command.s: src/command.cpp.s
 src/command.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/command.cpp.s
 .PHONY : src/command.cpp.s
+
+src/distribution.o: src/distribution.cpp.o
+.PHONY : src/distribution.o
+
+# target to build an object file
+src/distribution.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/distribution.cpp.o
+.PHONY : src/distribution.cpp.o
+
+src/distribution.i: src/distribution.cpp.i
+.PHONY : src/distribution.i
+
+# target to preprocess a source file
+src/distribution.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/distribution.cpp.i
+.PHONY : src/distribution.cpp.i
+
+src/distribution.s: src/distribution.cpp.s
+.PHONY : src/distribution.s
+
+# target to generate assembly for a file
+src/distribution.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/distribution.cpp.s
+.PHONY : src/distribution.cpp.s
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
@@ -282,9 +330,15 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... main"
+	@echo "... src/bpflog_reader.o"
+	@echo "... src/bpflog_reader.i"
+	@echo "... src/bpflog_reader.s"
 	@echo "... src/command.o"
 	@echo "... src/command.i"
 	@echo "... src/command.s"
+	@echo "... src/distribution.o"
+	@echo "... src/distribution.i"
+	@echo "... src/distribution.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

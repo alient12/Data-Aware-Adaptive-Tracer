@@ -14,6 +14,8 @@ add_executable(main
     src/tracer_logic.cpp
     src/command.cpp
     src/terminal.cpp
+    src/bpflog_reader.cpp
+    src/distribution.cpp
 )
 target_link_libraries(
     main

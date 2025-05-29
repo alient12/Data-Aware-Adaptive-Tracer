@@ -1,7 +1,7 @@
 TraceCondition:
   Command: /home/alient/Codes/eunomia-bpf-examples/ioctl-hook/ioctl_bug
   Sudo: True
-  NoExec: False
+  NoExec: True
   LogsDir: ./tracer_logs
   ScriptPath: ./script.bt
   Targets:

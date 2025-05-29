@@ -8,7 +8,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/alient/Codes/Data-Aware-Adaptive-Tracer/src/bpflog_reader.cpp" "CMakeFiles/main.dir/src/bpflog_reader.cpp.o" "gcc" "CMakeFiles/main.dir/src/bpflog_reader.cpp.o.d"
   "/home/alient/Codes/Data-Aware-Adaptive-Tracer/src/command.cpp" "CMakeFiles/main.dir/src/command.cpp.o" "gcc" "CMakeFiles/main.dir/src/command.cpp.o.d"
+  "/home/alient/Codes/Data-Aware-Adaptive-Tracer/src/distribution.cpp" "CMakeFiles/main.dir/src/distribution.cpp.o" "gcc" "CMakeFiles/main.dir/src/distribution.cpp.o.d"
   "/home/alient/Codes/Data-Aware-Adaptive-Tracer/src/main.cpp" "CMakeFiles/main.dir/src/main.cpp.o" "gcc" "CMakeFiles/main.dir/src/main.cpp.o.d"
   "/home/alient/Codes/Data-Aware-Adaptive-Tracer/src/script_writer.cpp" "CMakeFiles/main.dir/src/script_writer.cpp.o" "gcc" "CMakeFiles/main.dir/src/script_writer.cpp.o.d"
   "/home/alient/Codes/Data-Aware-Adaptive-Tracer/src/terminal.cpp" "CMakeFiles/main.dir/src/terminal.cpp.o" "gcc" "CMakeFiles/main.dir/src/terminal.cpp.o.d"

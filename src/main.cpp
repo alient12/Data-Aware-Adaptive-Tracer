@@ -3,6 +3,8 @@
 #include "tracer_logic.hpp"
 #include "terminal.hpp"
 #include "command.hpp"
+#include "bpflog_reader.hpp"
+#include "distribution.hpp"
 #include <iostream>
 #include <string>
 #include <thread>
@@ -23,6 +25,9 @@ int main(int argc, char* argv[]) {
     auto traceMutex = std::make_shared<std::mutex>();
     auto traceUpdated = std::make_shared<std::atomic<bool>>(false);
     auto terminate = std::make_shared<std::atomic<bool>>(false);
+
+    LogParser parser;
+    DistributionCalculator calculator;
 
     // Parse command line arguments
     for (int i = 1; i < argc; ++i) {
@@ -73,6 +78,9 @@ int main(int argc, char* argv[]) {
                 {
                     std::lock_guard<std::mutex> lock(*traceMutex);
                     // *traceLine = "[BPFtrace] |" + output.substr(0, 50);
+                    parser.parseFromString(output);
+                    calculator.computeDistribution(parser.getSamplerArgMap());
+                    std::string rareArgCondition = calculator.generateRareArgCondition(1, "ioctl", 1);
                     *traceLine = "[BPFtrace] | updated threholds";
                     *traceUpdated = true;
                 }
@@ -91,6 +99,16 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
+
+    // parser.parseFromFile("./tracer_logs/trace_20250528_222900.log");
+    // parser.printResults();
+
+    // calculator.computeDistribution(parser.getSamplerArgMap());
+    // calculator.printDistributions();
+
+    // std::string rareArgCondition = calculator.generateRareArgCondition(1, "ioctl", 1);
+    // std::cout << "Rare condition: " << rareArgCondition << std::endl;
+
 
     return 0;
 }
