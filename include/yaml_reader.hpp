@@ -21,6 +21,7 @@ struct TraceDescriptor {
     std::string func;
     std::string hookType;
     std::string trigger;
+    bool storeRetval;
 };
 
 class YamlReader {

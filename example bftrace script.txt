@@ -1,5 +1,39 @@
 #!/usr/bin/env bpftrace
 
+BEGIN {@args1[0] = 0;}
+
+uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
+{
+    if (((arg0 >= 3937053353 && arg0 <= 4294967295)) || ((arg1 >= 843066546 && arg1 <= 1124085656)))
+    {
+        printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:auto arg0 arg1, Comm: %s, PID: %d\n", comm, pid);
+        $t = nsecs(monotonic);
+        @count1_ioctl[comm, pid, tid, arg0, arg1] = count();
+        @stack1_ioctl[comm, pid, tid, $t, arg0, arg1] = ustack;
+        @args1[0] = arg0;
+        @args1[1] = arg1;
+        @flag1[comm, pid, tid] = 1;
+    }
+    @sampler1_ioctl_arg0[arg0] = count();
+    @sampler1_ioctl_arg1[arg1] = count();
+}
+
+uretprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
+{
+    if (@flag1[comm, pid, tid] == 1)
+    {
+        printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:uretprobe, Comm: %s, PID: %d\n", comm, $#);
+        // @count11_ioctl[comm, pid, retval] = $#;
+        // @stack11_ioctl[comm, pid, retval] = ustack(raw, 3);
+        @flag1[comm, pid, tid] = 0;
+        $t = nsecs(monotonic);
+        @ret1_ioctl[comm, pid, tid, $t, @args1[0], @args1[1]] = retval;
+    }
+    // @sampler11_ioctl_ret[retval] = count();
+    // @sampler11_ioctl_ret[retval] = count();
+}
+
+
 
 uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 / reg("si") == 0x541c / {

@@ -1,26 +1,31 @@
 TraceCondition:
   Command: bash -c 'while true; do /home/alient/Codes/eunomia-bpf-examples/ioctl-hook/ioctl_bug; sleep 1; done'
   Sudo: True
-  NoExec: False
+  NoExec: True
   LogsDir: ./tracer_logs
   ScriptPath: ./script.bt
   Targets:
   - FilePath: /lib/x86_64-linux-gnu/libc.so.6
+    HeaderPath: ...
     Functions:
       - Func: ioctl
         HookType: uprobe
+        StoreRetval: True
         Triggers:
           - arg1 == 0x541c
           - auto arg0 arg1
   - FilePath: /lib/x86_64-linux-gnu/libcrypto.so.3
+    HeaderPath: ...
     Functions:
       - Func: EVP_EncryptUpdate
         HookType: uprobe
+        StoreRetval: False
         Triggers:
           - arg4 >= 64 && arg4 <= 1024
           - auto arg4 arg5
       - Func: EVP_EncryptFinal_ex
         HookType: uprobe
+        StoreRetval: True
         Triggers:
           - arg2 > 0 && arg2 <= 1024
           - auto arg1

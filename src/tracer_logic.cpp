@@ -62,6 +62,9 @@ Tracer::Tracer(TraceDescriptor& td, size_t id, DistributionCalculator& dc)
 
     countMapName = "@count" + std::to_string((int)id) + "_" + td.func;
     stackMapName = "@stack" + std::to_string((int)id) + "_" + td.func;
+    argsMapName = "@args" + std::to_string((int)id) + "_" + td.func;
+    flagMapName = "@flag" + std::to_string((int)id) + "_" + td.func;
+    retMapName = "@ret" + std::to_string((int)id) + "_" + td.func;
 
     generate_script();
 }
@@ -73,6 +76,9 @@ Tracer::Tracer(Tracer&& other) noexcept
       type(std::move(other.type)),
       countMapName(std::move(other.countMapName)),
       stackMapName(std::move(other.stackMapName)),
+      argsMapName(std::move(other.argsMapName)),
+      flagMapName(std::move(other.flagMapName)),
+      retMapName(std::move(other.retMapName)),
       samplerMapNames(std::move(other.samplerMapNames)),
       script(std::move(other.script)),
       args(std::move(other.args)),
@@ -95,6 +101,21 @@ std::string Tracer::getCountMapName()
 std::string Tracer::getStackMapName()
 {
     return stackMapName;
+}
+
+std::string Tracer::getArgsMapName()
+{
+    return argsMapName;
+}
+
+std::string Tracer::getFlagMapName()
+{
+    return flagMapName;
+}
+
+std::string Tracer::getRetMapName()
+{
+    return retMapName;
 }
 
 std::vector<std::string> Tracer::getSamplerMapNames()
@@ -129,8 +150,19 @@ void Tracer::generate_script()
     script += ind4 + "{\n";
 
     script += ind8 + "printf(\"" + td.filePath + ":" + td.func + ":" + td.trigger + ", Comm: \%s, PID: \%d\\n\"" + ", comm, pid);\n";
-    script += ind8 + countMapName + "[comm, pid" + argkeys + "] = count();\n";
-    script += ind8 + stackMapName + "[comm, pid" + argkeys + "] = ustack;\n";
+    script += ind8 + "$t = nsecs(monotonic);\n";
+    script += ind8 + countMapName + "[comm, pid, tid" + argkeys + "] = count();\n";
+    script += ind8 + stackMapName + "[comm, pid, tid, $t" + argkeys + "] = ustack;\n";
+    
+    if (td.storeRetval)
+    {
+        for (size_t i = 0; i < args.size(); i++)
+        {
+            script += ind8 + argsMapName + "[" + std::to_string(i) + "] = " + args[i] + ";\n";
+        } 
+
+        script += ind8 + flagMapName + "[comm, pid, tid] = 1;\n";
+    }
 
     script += ind4 + "}\n";
 
@@ -142,6 +174,37 @@ void Tracer::generate_script()
 
     script += "}\n";
     script += "\n\n";
+
+    if (td.storeRetval)
+    {
+        std::string retprobe;
+        if (td.hookType == "uprobe") retprobe = "uretprobe";
+        if (td.hookType == "kprobe") retprobe = "kretprobe";
+        if (td.hookType == "fentry") retprobe = "fexit";
+        script += retprobe + ":" + td.filePath + ":" + td.func + "\n";
+        script += "{\n";
+
+        script += ind4 + "if (" + flagMapName + "[comm, pid, tid] == 1)\n";
+        script += ind4 + "{\n";
+
+        // script += ind8 + "printf(\"" + td.filePath + ":" + td.func + ":" + td.trigger + ", Comm: \%s, PID: \%d\\n\"" + ", comm, pid);\n";
+        script += ind8 + "$t = nsecs(monotonic);\n";
+        // script += ind8 + countMapName + "[comm, pid, tid" + argkeys + "] = count();\n";
+        // script += ind8 + stackMapName + "[comm, pid, tid, $t" + argkeys + "] = ustack;\n";
+        script += ind8 + flagMapName + "[comm, pid, tid] = 0;\n";
+
+        std::string argsMapkey;
+        for (size_t i = 0; i < args.size(); i++)
+        {
+            argsMapkey += ", " + argsMapName + "[" + std::to_string(i) + "]";
+        }
+
+        script += ind8 + retMapName + "[comm, pid, tid, $t" + argsMapkey + "] = retval;\n";
+
+        script += ind4 + "}\n";
+        script += "}\n";
+        script += "\n\n";
+    }
 }
 
 bool Tracer::generate_auto_triggers() {
@@ -195,6 +258,12 @@ Tracer* TraceController::addTracer(TraceDescriptor& td) {
         Tracer* tracerPtr = &it->second;
         stackMapNames.insert(tracerPtr->getStackMapName());
         countMapNames.insert(tracerPtr->getCountMapName());
+        if (td.storeRetval)
+        {
+            argsMapNames.insert(tracerPtr->getArgsMapName());
+            flagMapNames.insert(tracerPtr->getFlagMapName());
+            retMapNames.insert(tracerPtr->getRetMapName());
+        }
 
         if (tracerPtr->getType() == TracerType::AUTO) {
             for (const auto& sampler : tracerPtr->getSamplerMapNames()) {
@@ -222,6 +291,21 @@ const std::set<std::string>& TraceController::getStackMapNames()
 const std::set<std::string>& TraceController::getCountMapNames()
 {
     return countMapNames;
+}
+
+const std::set<std::string>& TraceController::getArgsMapNames()
+{
+    return argsMapNames;
+}
+
+const std::set<std::string>& TraceController::getFlagMapNames()
+{
+    return flagMapNames;
+}
+
+const std::set<std::string>& TraceController::getRetMapNames()
+{
+    return retMapNames;
 }
 
 const std::set<std::string>& TraceController::getSamplerMapNames()
@@ -260,6 +344,9 @@ std::string TraceController::generateInterval(const size_t& t)
     for (const auto& map: samplerMapNames) {
         s += ind4 + "print(" + map + ");clear(" + map + ");\n";
     }
+    for (const auto& map: retMapNames) {
+        s += ind4 + "print(" + map + ");clear(" + map + ");\n";
+    }
 
     s += ind4 + "exit();\n";
     s += "}\n";
@@ -271,11 +358,29 @@ std::string TraceController::generateScript()
     std::string script;
     script += "#!/usr/bin/env bpftrace\n\n";
 
+    script += generateBegin();
+
     for (const auto& [id, tracer] : tracers) {
         script += tracer.getScript();
     }
 
     script += generateInterval(5);
+
+    return script;
+}
+
+std::string TraceController::generateBegin()
+{
+    std::string script;
+    std::string ind4{string_multiplier(" ", 4)};
+
+    script += "BEGIN\n";
+    script += "{\n";
+    for (const auto& map: argsMapNames) {
+        script += ind4 + map + "[0] = 0;\n";
+    }
+    script += "}\n";
+    script += "\n\n";
 
     return script;
 }

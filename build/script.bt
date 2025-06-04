@@ -1,26 +1,64 @@
 #!/usr/bin/env bpftrace
 
+BEGIN
+{
+    @args0_ioctl[0] = 0;
+    @args1_ioctl[0] = 0;
+    @args4_EVP_EncryptFinal_ex[0] = 0;
+    @args5_EVP_EncryptFinal_ex[0] = 0;
+}
+
+
 uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 {
     if (arg1 == 0x541c)
     {
         printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:arg1 == 0x541c, Comm: %s, PID: %d\n", comm, pid);
-        @count0_ioctl[comm, pid, arg1] = count();
-        @stack0_ioctl[comm, pid, arg1] = ustack;
+        $t = nsecs(monotonic);
+        @count0_ioctl[comm, pid, tid, arg1] = count();
+        @stack0_ioctl[comm, pid, tid, $t, arg1] = ustack;
+        @args0_ioctl[0] = arg1;
+        @flag0_ioctl[comm, pid, tid] = 1;
+    }
+}
+
+
+uretprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
+{
+    if (@flag0_ioctl[comm, pid, tid] == 1)
+    {
+        $t = nsecs(monotonic);
+        @flag0_ioctl[comm, pid, tid] = 0;
+        @ret0_ioctl[comm, pid, tid, $t, @args0_ioctl[0]] = retval;
     }
 }
 
 
 uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 {
-    if (((arg0 >= 3988183916 && arg0 <= 4294967295)) || ((arg1 >= 963503307 && arg1 <= 1204376829)))
+    if (((arg0 >= 12 && arg0 <= 18)) || ((arg1 >= 2865192656 && arg1 <= 3223340586)))
     {
         printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:auto arg0 arg1, Comm: %s, PID: %d\n", comm, pid);
-        @count1_ioctl[comm, pid, arg0, arg1] = count();
-        @stack1_ioctl[comm, pid, arg0, arg1] = ustack;
+        $t = nsecs(monotonic);
+        @count1_ioctl[comm, pid, tid, arg0, arg1] = count();
+        @stack1_ioctl[comm, pid, tid, $t, arg0, arg1] = ustack;
+        @args1_ioctl[0] = arg0;
+        @args1_ioctl[1] = arg1;
+        @flag1_ioctl[comm, pid, tid] = 1;
     }
     @sampler1_ioctl_arg0[arg0] = count();
     @sampler1_ioctl_arg1[arg1] = count();
+}
+
+
+uretprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
+{
+    if (@flag1_ioctl[comm, pid, tid] == 1)
+    {
+        $t = nsecs(monotonic);
+        @flag1_ioctl[comm, pid, tid] = 0;
+        @ret1_ioctl[comm, pid, tid, $t, @args1_ioctl[0], @args1_ioctl[1]] = retval;
+    }
 }
 
 
@@ -29,8 +67,9 @@ uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate
     if (arg4 >= 64 && arg4 <= 1024)
     {
         printf("/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate:arg4 >= 64 && arg4 <= 1024, Comm: %s, PID: %d\n", comm, pid);
-        @count2_EVP_EncryptUpdate[comm, pid, arg4] = count();
-        @stack2_EVP_EncryptUpdate[comm, pid, arg4] = ustack;
+        $t = nsecs(monotonic);
+        @count2_EVP_EncryptUpdate[comm, pid, tid, arg4] = count();
+        @stack2_EVP_EncryptUpdate[comm, pid, tid, $t, arg4] = ustack;
     }
 }
 
@@ -40,8 +79,9 @@ uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate
     if (true)
     {
         printf("/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptUpdate:auto arg4 arg5, Comm: %s, PID: %d\n", comm, pid);
-        @count3_EVP_EncryptUpdate[comm, pid, arg4, arg5] = count();
-        @stack3_EVP_EncryptUpdate[comm, pid, arg4, arg5] = ustack;
+        $t = nsecs(monotonic);
+        @count3_EVP_EncryptUpdate[comm, pid, tid, arg4, arg5] = count();
+        @stack3_EVP_EncryptUpdate[comm, pid, tid, $t, arg4, arg5] = ustack;
     }
     @sampler3_EVP_EncryptUpdate_arg4[arg4] = count();
     @sampler3_EVP_EncryptUpdate_arg5[arg5] = count();
@@ -53,8 +93,22 @@ uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex
     if (arg2 > 0 && arg2 <= 1024)
     {
         printf("/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex:arg2 > 0 && arg2 <= 1024, Comm: %s, PID: %d\n", comm, pid);
-        @count4_EVP_EncryptFinal_ex[comm, pid, arg2] = count();
-        @stack4_EVP_EncryptFinal_ex[comm, pid, arg2] = ustack;
+        $t = nsecs(monotonic);
+        @count4_EVP_EncryptFinal_ex[comm, pid, tid, arg2] = count();
+        @stack4_EVP_EncryptFinal_ex[comm, pid, tid, $t, arg2] = ustack;
+        @args4_EVP_EncryptFinal_ex[0] = arg2;
+        @flag4_EVP_EncryptFinal_ex[comm, pid, tid] = 1;
+    }
+}
+
+
+uretprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex
+{
+    if (@flag4_EVP_EncryptFinal_ex[comm, pid, tid] == 1)
+    {
+        $t = nsecs(monotonic);
+        @flag4_EVP_EncryptFinal_ex[comm, pid, tid] = 0;
+        @ret4_EVP_EncryptFinal_ex[comm, pid, tid, $t, @args4_EVP_EncryptFinal_ex[0]] = retval;
     }
 }
 
@@ -64,10 +118,24 @@ uprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex
     if (true)
     {
         printf("/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex:auto arg1, Comm: %s, PID: %d\n", comm, pid);
-        @count5_EVP_EncryptFinal_ex[comm, pid, arg1] = count();
-        @stack5_EVP_EncryptFinal_ex[comm, pid, arg1] = ustack;
+        $t = nsecs(monotonic);
+        @count5_EVP_EncryptFinal_ex[comm, pid, tid, arg1] = count();
+        @stack5_EVP_EncryptFinal_ex[comm, pid, tid, $t, arg1] = ustack;
+        @args5_EVP_EncryptFinal_ex[0] = arg1;
+        @flag5_EVP_EncryptFinal_ex[comm, pid, tid] = 1;
     }
     @sampler5_EVP_EncryptFinal_ex_arg1[arg1] = count();
+}
+
+
+uretprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex
+{
+    if (@flag5_EVP_EncryptFinal_ex[comm, pid, tid] == 1)
+    {
+        $t = nsecs(monotonic);
+        @flag5_EVP_EncryptFinal_ex[comm, pid, tid] = 0;
+        @ret5_EVP_EncryptFinal_ex[comm, pid, tid, $t, @args5_EVP_EncryptFinal_ex[0]] = retval;
+    }
 }
 
 
@@ -90,5 +158,9 @@ interval:s:5
     print(@sampler3_EVP_EncryptUpdate_arg4);clear(@sampler3_EVP_EncryptUpdate_arg4);
     print(@sampler3_EVP_EncryptUpdate_arg5);clear(@sampler3_EVP_EncryptUpdate_arg5);
     print(@sampler5_EVP_EncryptFinal_ex_arg1);clear(@sampler5_EVP_EncryptFinal_ex_arg1);
+    print(@ret0_ioctl);clear(@ret0_ioctl);
+    print(@ret1_ioctl);clear(@ret1_ioctl);
+    print(@ret4_EVP_EncryptFinal_ex);clear(@ret4_EVP_EncryptFinal_ex);
+    print(@ret5_EVP_EncryptFinal_ex);clear(@ret5_EVP_EncryptFinal_ex);
     exit();
 }

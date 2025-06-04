@@ -5,13 +5,16 @@ std::string generate_bpftrace_script(YamlReader& reader, TraceController& tctrl)
     std::string script;
     script += "#!/usr/bin/env bpftrace\n\n";
 
+    
     auto tracers = reader.getTracers();
     for (auto& td : tracers) 
     {
         Tracer* tp = tctrl.addTracer(td);
         script += tp->getScript();
     }
-
+    
+    script += tctrl.generateBegin();
+    
     script += tctrl.generateInterval(5);
 
     return script;

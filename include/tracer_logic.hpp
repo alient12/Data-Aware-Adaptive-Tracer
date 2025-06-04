@@ -34,6 +34,9 @@ class Tracer
     size_t getId();
     std::string getCountMapName();
     std::string getStackMapName();
+    std::string getArgsMapName();
+    std::string getFlagMapName();
+    std::string getRetMapName();
     std::vector<std::string> getSamplerMapNames();
     // std::string getTriggerScript();
     TracerType getType();
@@ -52,6 +55,9 @@ class Tracer
     TracerType type;
     std::string countMapName;
     std::string stackMapName;
+    std::string argsMapName;
+    std::string flagMapName;
+    std::string retMapName;
     std::vector<std::string> samplerMapNames;
     TraceDescriptor td;
     std::string script;
@@ -73,10 +79,14 @@ class TraceController
     Tracer* getTracerById(size_t& id);
     const std::set<std::string>& getStackMapNames();
     const std::set<std::string>& getCountMapNames();
+    const std::set<std::string>& getArgsMapNames();
+    const std::set<std::string>& getFlagMapNames();
+    const std::set<std::string>& getRetMapNames();
     const std::set<std::string>& getSamplerMapNames();
     int regenerateAllAutoTriggers();
     std::string generateInterval(const size_t& t);
     std::string generateScript();
+    std::string generateBegin();
     
     private:
     size_t tracerCounter{};
@@ -84,6 +94,9 @@ class TraceController
     DistributionCalculator& distCalc;
     std::set<std::string> stackMapNames;
     std::set<std::string> countMapNames;
+    std::set<std::string> argsMapNames;
+    std::set<std::string> flagMapNames;
+    std::set<std::string> retMapNames;
     std::set<std::string> samplerMapNames;
 };
 

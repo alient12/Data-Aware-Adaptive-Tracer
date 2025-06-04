@@ -47,6 +47,7 @@ std::vector<TraceDescriptor> YamlReader::getTracers() const
         {
             t.func = func["Func"].as<std::string>();
             t.hookType = func["HookType"].as<std::string>();
+            t.storeRetval = func["StoreRetval"] ? func["StoreRetval"].as<bool>() : false;
 
             for (const auto& trig : func["Triggers"])
             {
