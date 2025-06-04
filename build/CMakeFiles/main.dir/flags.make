@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/alient/Codes/Data-Aware-Adaptive-Tracer/include
+CXX_INCLUDES = -I/usr/lib/llvm-18/include -I/home/alient/Codes/Data-Aware-Adaptive-Tracer/include
 
 CXX_FLAGS = -std=gnu++20
 

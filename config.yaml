@@ -6,7 +6,8 @@ TraceCondition:
   ScriptPath: ./script.bt
   Targets:
   - FilePath: /lib/x86_64-linux-gnu/libc.so.6
-    HeaderPath: ...
+    HeaderPath: /usr/include/x86_64-linux-gnu/sys/ioctl.h
+    MaxVariadic: 10
     Functions:
       - Func: ioctl
         HookType: uprobe

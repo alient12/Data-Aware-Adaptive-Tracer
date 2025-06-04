@@ -529,3 +529,111 @@ events:
       
       
 ...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake:52 (cmake_check_source_compiles)"
+      - "/usr/lib/llvm-18/cmake/FindFFI.cmake:59 (check_c_source_compiles)"
+      - "/usr/lib/llvm-18/cmake/LLVMConfig.cmake:279 (find_package)"
+      - "CMakeLists.txt:10 (find_package)"
+    checks:
+      - "Performing Test HAVE_FFI_CALL"
+    directories:
+      source: "/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-Inf7px"
+      binary: "/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-Inf7px"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/usr/lib/llvm-18/cmake"
+    buildResult:
+      variable: "HAVE_FFI_CALL"
+      cached: true
+      stdout: |
+        Change Dir: '/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-Inf7px'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_034f6/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_034f6.dir/build.make CMakeFiles/cmTC_034f6.dir/build
+        gmake[1]: Entering directory '/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-Inf7px'
+        Building C object CMakeFiles/cmTC_034f6.dir/src.c.o
+        /usr/bin/cc -DHAVE_FFI_CALL   -o CMakeFiles/cmTC_034f6.dir/src.c.o -c /home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-Inf7px/src.c
+        Linking C executable cmTC_034f6
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_034f6.dir/link.txt --verbose=1
+        /usr/bin/cc CMakeFiles/cmTC_034f6.dir/src.c.o -o cmTC_034f6  /usr/lib/x86_64-linux-gnu/libffi.so 
+        gmake[1]: Leaving directory '/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-Inf7px'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "/usr/lib/llvm-18/cmake/FindLibEdit.cmake:28 (check_include_file)"
+      - "/usr/lib/llvm-18/cmake/LLVMConfig.cmake:286 (find_package)"
+      - "CMakeLists.txt:10 (find_package)"
+    checks:
+      - "Looking for histedit.h"
+    directories:
+      source: "/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-brl7cw"
+      binary: "/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-brl7cw"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/usr/lib/llvm-18/cmake"
+    buildResult:
+      variable: "HAVE_HISTEDIT_H"
+      cached: true
+      stdout: |
+        Change Dir: '/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-brl7cw'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_b2856/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_b2856.dir/build.make CMakeFiles/cmTC_b2856.dir/build
+        gmake[1]: Entering directory '/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-brl7cw'
+        Building C object CMakeFiles/cmTC_b2856.dir/CheckIncludeFile.c.o
+        /usr/bin/cc    -o CMakeFiles/cmTC_b2856.dir/CheckIncludeFile.c.o -c /home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-brl7cw/CheckIncludeFile.c
+        Linking C executable cmTC_b2856
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b2856.dir/link.txt --verbose=1
+        /usr/bin/cc CMakeFiles/cmTC_b2856.dir/CheckIncludeFile.c.o -o cmTC_b2856  /usr/lib/x86_64-linux-gnu/libedit.so 
+        gmake[1]: Leaving directory '/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-brl7cw'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake:52 (cmake_check_source_compiles)"
+      - "/usr/lib/llvm-18/cmake/FindTerminfo.cmake:32 (check_c_source_compiles)"
+      - "/usr/lib/llvm-18/cmake/LLVMConfig.cmake:291 (find_package)"
+      - "CMakeLists.txt:10 (find_package)"
+    checks:
+      - "Performing Test Terminfo_LINKABLE"
+    directories:
+      source: "/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-B5IL6r"
+      binary: "/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-B5IL6r"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/usr/lib/llvm-18/cmake"
+    buildResult:
+      variable: "Terminfo_LINKABLE"
+      cached: true
+      stdout: |
+        Change Dir: '/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-B5IL6r'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_6bf97/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_6bf97.dir/build.make CMakeFiles/cmTC_6bf97.dir/build
+        gmake[1]: Entering directory '/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-B5IL6r'
+        Building C object CMakeFiles/cmTC_6bf97.dir/src.c.o
+        /usr/bin/cc -DTerminfo_LINKABLE   -o CMakeFiles/cmTC_6bf97.dir/src.c.o -c /home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-B5IL6r/src.c
+        Linking C executable cmTC_6bf97
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6bf97.dir/link.txt --verbose=1
+        /usr/bin/cc CMakeFiles/cmTC_6bf97.dir/src.c.o -o cmTC_6bf97  /usr/lib/x86_64-linux-gnu/libtinfo.so 
+        gmake[1]: Leaving directory '/home/alient/Codes/Data-Aware-Adaptive-Tracer/build/CMakeFiles/CMakeScratch/TryCompile-B5IL6r'
+        
+      exitCode: 0
+...

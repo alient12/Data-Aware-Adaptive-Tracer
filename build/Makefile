@@ -201,6 +201,30 @@ src/distribution.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/distribution.cpp.s
 .PHONY : src/distribution.cpp.s
 
+src/function_parser.o: src/function_parser.cpp.o
+.PHONY : src/function_parser.o
+
+# target to build an object file
+src/function_parser.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/function_parser.cpp.o
+.PHONY : src/function_parser.cpp.o
+
+src/function_parser.i: src/function_parser.cpp.i
+.PHONY : src/function_parser.i
+
+# target to preprocess a source file
+src/function_parser.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/function_parser.cpp.i
+.PHONY : src/function_parser.cpp.i
+
+src/function_parser.s: src/function_parser.cpp.s
+.PHONY : src/function_parser.s
+
+# target to generate assembly for a file
+src/function_parser.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/function_parser.cpp.s
+.PHONY : src/function_parser.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -339,6 +363,9 @@ help:
 	@echo "... src/distribution.o"
 	@echo "... src/distribution.i"
 	@echo "... src/distribution.s"
+	@echo "... src/function_parser.o"
+	@echo "... src/function_parser.i"
+	@echo "... src/function_parser.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

@@ -1,14 +1,5 @@
 #!/usr/bin/env bpftrace
 
-BEGIN
-{
-    @args0_ioctl[0] = 0;
-    @args1_ioctl[0] = 0;
-    @args4_EVP_EncryptFinal_ex[0] = 0;
-    @args5_EVP_EncryptFinal_ex[0] = 0;
-}
-
-
 uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 {
     if (arg1 == 0x541c)
@@ -36,7 +27,7 @@ uretprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 
 uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
 {
-    if (((arg0 >= 12 && arg0 <= 18)) || ((arg1 >= 2865192656 && arg1 <= 3223340586)))
+    if (true)
     {
         printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:auto arg0 arg1, Comm: %s, PID: %d\n", comm, pid);
         $t = nsecs(monotonic);
@@ -136,6 +127,15 @@ uretprobe:/lib/x86_64-linux-gnu/libcrypto.so.3:EVP_EncryptFinal_ex
         @flag5_EVP_EncryptFinal_ex[comm, pid, tid] = 0;
         @ret5_EVP_EncryptFinal_ex[comm, pid, tid, $t, @args5_EVP_EncryptFinal_ex[0]] = retval;
     }
+}
+
+
+BEGIN
+{
+    @args0_ioctl[0] = 0;
+    @args1_ioctl[0] = 0;
+    @args4_EVP_EncryptFinal_ex[0] = 0;
+    @args5_EVP_EncryptFinal_ex[0] = 0;
 }
 
 
