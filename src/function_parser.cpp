@@ -44,6 +44,7 @@ void FunctionParser::handleFunction(CXCursor cursor) {
             auto def = extractStructDefinition(canonicalType, visitedTypes);
             if (!def.name.empty()) {
                 types_.push_back(def);
+                func.usedTypes.push_back(def);
             }
         }
 
@@ -129,7 +130,7 @@ TypeDefinition FunctionParser::extractStructDefinition(CXType type, std::unorder
         }, &context);
 
     globalTypeCache_[def.name] = def;
-    
+
     return def;
 }
 
@@ -137,6 +138,10 @@ TypeDefinition FunctionParser::extractStructDefinition(CXType type, std::unorder
 
 std::vector<TypeDefinition> FunctionParser::getCollectedTypes() const {
     return types_;
+}
+
+std::vector<FunctionInfo> FunctionParser::getFunctions() const {
+    return functions_;
 }
 
 void printStruct(const TypeDefinition& type, int indent) {
@@ -148,4 +153,22 @@ void printStruct(const TypeDefinition& type, int indent) {
     for (const auto& nested : type.nested) {
         printStruct(nested, indent + 1);
     }
+}
+
+int FunctionParser::getArgumentCount(const std::string& functionName, int maxVariadic) const {
+    for (const auto& func : functions_) {
+        if (func.name == functionName) {
+            int count = 0;
+            for (const auto& arg : func.arguments) {
+                if (arg.isVariadic) {
+                    count += maxVariadic;
+                } else {
+                    count += 1;
+                }
+            }
+            return count;
+        }
+    }
+    std::cerr << "[WARN] Function '" << functionName << "' not found.\n";
+    return -1;
 }

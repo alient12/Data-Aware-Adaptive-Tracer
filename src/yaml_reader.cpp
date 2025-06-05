@@ -43,10 +43,12 @@ std::vector<TraceDescriptor> YamlReader::getTracers() const
     for (const auto& target_node : targets) {
         TraceDescriptor t;
         t.filePath = target_node["FilePath"].as<std::string>();
+        t.headerPath = target_node["HeaderPath"] ? target_node["HeaderPath"].as<std::string>() : "";
         for (const auto& func : target_node["Functions"])
         {
             t.func = func["Func"].as<std::string>();
             t.hookType = func["HookType"].as<std::string>();
+            t.maxVariadic = func["MaxVariadic"] ? func["MaxVariadic"].as<int>() : 1;
             t.storeRetval = func["StoreRetval"] ? func["StoreRetval"].as<bool>() : false;
 
             for (const auto& trig : func["Triggers"])

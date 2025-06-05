@@ -1423,6 +1423,7 @@ CMakeFiles/main.dir/src/main.cpp.o: /home/alient/Codes/Data-Aware-Adaptive-Trace
 
 CMakeFiles/main.dir/src/script_writer.cpp.o: /home/alient/Codes/Data-Aware-Adaptive-Tracer/src/script_writer.cpp \
   /home/alient/Codes/Data-Aware-Adaptive-Tracer/include/distribution.hpp \
+  /home/alient/Codes/Data-Aware-Adaptive-Tracer/include/function_parser.hpp \
   /home/alient/Codes/Data-Aware-Adaptive-Tracer/include/script_writer.hpp \
   /home/alient/Codes/Data-Aware-Adaptive-Tracer/include/tracer_logic.hpp \
   /home/alient/Codes/Data-Aware-Adaptive-Tracer/include/yaml_reader.hpp \
@@ -1461,6 +1462,8 @@ CMakeFiles/main.dir/src/script_writer.cpp.o: /home/alient/Codes/Data-Aware-Adapt
   /usr/include/c++/13/bits/functexcept.h \
   /usr/include/c++/13/bits/functional_hash.h \
   /usr/include/c++/13/bits/hash_bytes.h \
+  /usr/include/c++/13/bits/hashtable.h \
+  /usr/include/c++/13/bits/hashtable_policy.h \
   /usr/include/c++/13/bits/invoke.h \
   /usr/include/c++/13/bits/ios_base.h \
   /usr/include/c++/13/bits/istream.tcc \
@@ -1539,6 +1542,8 @@ CMakeFiles/main.dir/src/script_writer.cpp.o: /home/alient/Codes/Data-Aware-Adapt
   /usr/include/c++/13/bits/stringfwd.h \
   /usr/include/c++/13/bits/uniform_int_dist.h \
   /usr/include/c++/13/bits/unique_ptr.h \
+  /usr/include/c++/13/bits/unordered_map.h \
+  /usr/include/c++/13/bits/unordered_set.h \
   /usr/include/c++/13/bits/uses_allocator.h \
   /usr/include/c++/13/bits/uses_allocator_args.h \
   /usr/include/c++/13/bits/utility.h \
@@ -1614,6 +1619,8 @@ CMakeFiles/main.dir/src/script_writer.cpp.o: /home/alient/Codes/Data-Aware-Adapt
   /usr/include/c++/13/tuple \
   /usr/include/c++/13/type_traits \
   /usr/include/c++/13/typeinfo \
+  /usr/include/c++/13/unordered_map \
+  /usr/include/c++/13/unordered_set \
   /usr/include/c++/13/variant \
   /usr/include/c++/13/vector \
   /usr/include/ctype.h \
@@ -1728,7 +1735,16 @@ CMakeFiles/main.dir/src/script_writer.cpp.o: /home/alient/Codes/Data-Aware-Adapt
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
-  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h
+  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h \
+  /usr/lib/llvm-18/include/clang-c/BuildSystem.h \
+  /usr/lib/llvm-18/include/clang-c/CXDiagnostic.h \
+  /usr/lib/llvm-18/include/clang-c/CXErrorCode.h \
+  /usr/lib/llvm-18/include/clang-c/CXFile.h \
+  /usr/lib/llvm-18/include/clang-c/CXSourceLocation.h \
+  /usr/lib/llvm-18/include/clang-c/CXString.h \
+  /usr/lib/llvm-18/include/clang-c/ExternC.h \
+  /usr/lib/llvm-18/include/clang-c/Index.h \
+  /usr/lib/llvm-18/include/clang-c/Platform.h
 
 CMakeFiles/main.dir/src/terminal.cpp.o: /home/alient/Codes/Data-Aware-Adaptive-Tracer/src/terminal.cpp \
   /home/alient/Codes/Data-Aware-Adaptive-Tracer/include/terminal.hpp \
@@ -2044,6 +2060,7 @@ CMakeFiles/main.dir/src/terminal.cpp.o: /home/alient/Codes/Data-Aware-Adaptive-T
 
 CMakeFiles/main.dir/src/tracer_logic.cpp.o: /home/alient/Codes/Data-Aware-Adaptive-Tracer/src/tracer_logic.cpp \
   /home/alient/Codes/Data-Aware-Adaptive-Tracer/include/distribution.hpp \
+  /home/alient/Codes/Data-Aware-Adaptive-Tracer/include/function_parser.hpp \
   /home/alient/Codes/Data-Aware-Adaptive-Tracer/include/tracer_logic.hpp \
   /home/alient/Codes/Data-Aware-Adaptive-Tracer/include/yaml_reader.hpp \
   /usr/include/alloca.h \
@@ -2080,6 +2097,8 @@ CMakeFiles/main.dir/src/tracer_logic.cpp.o: /home/alient/Codes/Data-Aware-Adapti
   /usr/include/c++/13/bits/functexcept.h \
   /usr/include/c++/13/bits/functional_hash.h \
   /usr/include/c++/13/bits/hash_bytes.h \
+  /usr/include/c++/13/bits/hashtable.h \
+  /usr/include/c++/13/bits/hashtable_policy.h \
   /usr/include/c++/13/bits/invoke.h \
   /usr/include/c++/13/bits/ios_base.h \
   /usr/include/c++/13/bits/istream.tcc \
@@ -2158,6 +2177,8 @@ CMakeFiles/main.dir/src/tracer_logic.cpp.o: /home/alient/Codes/Data-Aware-Adapti
   /usr/include/c++/13/bits/stringfwd.h \
   /usr/include/c++/13/bits/uniform_int_dist.h \
   /usr/include/c++/13/bits/unique_ptr.h \
+  /usr/include/c++/13/bits/unordered_map.h \
+  /usr/include/c++/13/bits/unordered_set.h \
   /usr/include/c++/13/bits/uses_allocator.h \
   /usr/include/c++/13/bits/uses_allocator_args.h \
   /usr/include/c++/13/bits/utility.h \
@@ -2232,6 +2253,8 @@ CMakeFiles/main.dir/src/tracer_logic.cpp.o: /home/alient/Codes/Data-Aware-Adapti
   /usr/include/c++/13/tuple \
   /usr/include/c++/13/type_traits \
   /usr/include/c++/13/typeinfo \
+  /usr/include/c++/13/unordered_map \
+  /usr/include/c++/13/unordered_set \
   /usr/include/c++/13/variant \
   /usr/include/c++/13/vector \
   /usr/include/ctype.h \
@@ -2344,7 +2367,16 @@ CMakeFiles/main.dir/src/tracer_logic.cpp.o: /home/alient/Codes/Data-Aware-Adapti
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
-  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h
+  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h \
+  /usr/lib/llvm-18/include/clang-c/BuildSystem.h \
+  /usr/lib/llvm-18/include/clang-c/CXDiagnostic.h \
+  /usr/lib/llvm-18/include/clang-c/CXErrorCode.h \
+  /usr/lib/llvm-18/include/clang-c/CXFile.h \
+  /usr/lib/llvm-18/include/clang-c/CXSourceLocation.h \
+  /usr/lib/llvm-18/include/clang-c/CXString.h \
+  /usr/lib/llvm-18/include/clang-c/ExternC.h \
+  /usr/lib/llvm-18/include/clang-c/Index.h \
+  /usr/lib/llvm-18/include/clang-c/Platform.h
 
 CMakeFiles/main.dir/src/yaml_reader.cpp.o: /home/alient/Codes/Data-Aware-Adaptive-Tracer/src/yaml_reader.cpp \
   /home/alient/Codes/Data-Aware-Adaptive-Tracer/include/yaml_reader.hpp \

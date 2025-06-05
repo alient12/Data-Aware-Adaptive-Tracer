@@ -18,9 +18,11 @@
 
 struct TraceDescriptor {
     std::string filePath;
+    std::string headerPath;
     std::string func;
     std::string hookType;
     std::string trigger;
+    int maxVariadic;
     bool storeRetval;
 };
 

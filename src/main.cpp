@@ -115,28 +115,37 @@ int main(int argc, char* argv[]) {
     // std::string rareArgCondition = distCalc.generateRareArgCondition(1, "ioctl", 1);
     // std::cout << "Rare condition: " << rareArgCondition << std::endl;
 
-    FunctionParser fparser("/usr/include/x86_64-linux-gnu/sys/ioctl.h");
-    // FunctionParser fparser("/home/alient/Codes/eunomia-bpf-examples/ioctl-hook/ioctl_hook.h");
-    auto functions = fparser.parse();
-    auto types = fparser.getCollectedTypes();
-
-    for (const auto& func : functions) {
-        std::cout << "Function: " << func.name << "\n";
-        std::cout << "  Number of arguments: " << func.arguments.size() << "\n";
-        for (size_t i = 0; i < func.arguments.size(); ++i) {
-            const auto& arg = func.arguments[i];
-            std::cout << "    Arg " << i + 1 << ": " << arg.type;
-            if (arg.isVariadic)
-                std::cout << " (variadic)";
-            std::cout << "\n";
-        }
-    }
-
-    std::cout << "\n=== Struct Definitions ===\n";
-    for (const auto& type : types) {
-        printStruct(type);
-        std::cout << "\n";
-    }
+    
+    
+    
+    
+    // FunctionParser fparser("/usr/include/x86_64-linux-gnu/sys/ioctl.h");
+    // // FunctionParser fparser("/home/alient/Codes/eunomia-bpf-examples/ioctl-hook/ioctl_hook.h");
+    // fparser.parse();
+    // int argnum = fparser.getArgumentCount("ioctl", 5);
+    // std::cout << "Argument count (maxVariadic = 5): " << argnum << "\n";
+    
+    // auto functions = fparser.getFunctions();
+    // auto types = fparser.getCollectedTypes();
+    // for (const auto& func : functions) {
+    //     std::cout << "Function: " << func.name << "\n";
+    //     std::cout << "  Number of arguments: " << func.arguments.size() << "\n";
+    //     for (size_t i = 0; i < func.arguments.size(); ++i) {
+    //         const auto& arg = func.arguments[i];
+    //         std::cout << "    Arg " << i + 1 << ": " << arg.type;
+    //         if (arg.isVariadic)
+    //             std::cout << " (variadic)";
+    //         std::cout << "\n";
+    //     }
+    
+    //     std::cout << "  Used Structs:\n";
+    //     for (const auto& structDef : func.usedTypes) {
+    //         std::cout << "    Struct: " << structDef.name << "\n";
+    //         for (const auto& field : structDef.fields) {
+    //             std::cout << "      Field: " << field.first << " " << field.second << "\n";
+    //         }
+    //     }
+    // }
 
 
     return 0;

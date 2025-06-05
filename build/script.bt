@@ -6,9 +6,13 @@ uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
     {
         printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:arg1 == 0x541c, Comm: %s, PID: %d\n", comm, pid);
         $t = nsecs(monotonic);
-        @count0_ioctl[comm, pid, tid, arg1] = count();
-        @stack0_ioctl[comm, pid, tid, $t, arg1] = ustack;
-        @args0_ioctl[0] = arg1;
+        @count0_ioctl[comm, pid, tid, arg0, arg1, arg2, arg3, arg4] = count();
+        @stack0_ioctl[comm, pid, tid, $t, arg0, arg1, arg2, arg3, arg4] = ustack;
+        @args0_ioctl[0] = arg0;
+        @args0_ioctl[1] = arg1;
+        @args0_ioctl[2] = arg2;
+        @args0_ioctl[3] = arg3;
+        @args0_ioctl[4] = arg4;
         @flag0_ioctl[comm, pid, tid] = 1;
     }
 }
@@ -20,7 +24,7 @@ uretprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
     {
         $t = nsecs(monotonic);
         @flag0_ioctl[comm, pid, tid] = 0;
-        @ret0_ioctl[comm, pid, tid, $t, @args0_ioctl[0]] = retval;
+        @ret0_ioctl[comm, pid, tid, $t, @args0_ioctl[0], @args0_ioctl[1], @args0_ioctl[2], @args0_ioctl[3], @args0_ioctl[4]] = retval;
     }
 }
 
@@ -31,14 +35,20 @@ uprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
     {
         printf("/lib/x86_64-linux-gnu/libc.so.6:ioctl:auto arg0 arg1, Comm: %s, PID: %d\n", comm, pid);
         $t = nsecs(monotonic);
-        @count1_ioctl[comm, pid, tid, arg0, arg1] = count();
-        @stack1_ioctl[comm, pid, tid, $t, arg0, arg1] = ustack;
+        @count1_ioctl[comm, pid, tid, arg0, arg1, arg2, arg3, arg4] = count();
+        @stack1_ioctl[comm, pid, tid, $t, arg0, arg1, arg2, arg3, arg4] = ustack;
         @args1_ioctl[0] = arg0;
         @args1_ioctl[1] = arg1;
+        @args1_ioctl[2] = arg2;
+        @args1_ioctl[3] = arg3;
+        @args1_ioctl[4] = arg4;
         @flag1_ioctl[comm, pid, tid] = 1;
     }
     @sampler1_ioctl_arg0[arg0] = count();
     @sampler1_ioctl_arg1[arg1] = count();
+    @sampler1_ioctl_arg2[arg2] = count();
+    @sampler1_ioctl_arg3[arg3] = count();
+    @sampler1_ioctl_arg4[arg4] = count();
 }
 
 
@@ -48,7 +58,7 @@ uretprobe:/lib/x86_64-linux-gnu/libc.so.6:ioctl
     {
         $t = nsecs(monotonic);
         @flag1_ioctl[comm, pid, tid] = 0;
-        @ret1_ioctl[comm, pid, tid, $t, @args1_ioctl[0], @args1_ioctl[1]] = retval;
+        @ret1_ioctl[comm, pid, tid, $t, @args1_ioctl[0], @args1_ioctl[1], @args1_ioctl[2], @args1_ioctl[3], @args1_ioctl[4]] = retval;
     }
 }
 
@@ -155,6 +165,9 @@ interval:s:5
     print(@stack5_EVP_EncryptFinal_ex);clear(@stack5_EVP_EncryptFinal_ex);
     print(@sampler1_ioctl_arg0);clear(@sampler1_ioctl_arg0);
     print(@sampler1_ioctl_arg1);clear(@sampler1_ioctl_arg1);
+    print(@sampler1_ioctl_arg2);clear(@sampler1_ioctl_arg2);
+    print(@sampler1_ioctl_arg3);clear(@sampler1_ioctl_arg3);
+    print(@sampler1_ioctl_arg4);clear(@sampler1_ioctl_arg4);
     print(@sampler3_EVP_EncryptUpdate_arg4);clear(@sampler3_EVP_EncryptUpdate_arg4);
     print(@sampler3_EVP_EncryptUpdate_arg5);clear(@sampler3_EVP_EncryptUpdate_arg5);
     print(@sampler5_EVP_EncryptFinal_ex_arg1);clear(@sampler5_EVP_EncryptFinal_ex_arg1);

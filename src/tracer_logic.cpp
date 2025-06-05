@@ -54,7 +54,25 @@ Tracer::Tracer(TraceDescriptor& td, size_t id, DistributionCalculator& dc)
         triggerScript = td.trigger;
     }
 
-    args = findVars(td.trigger);
+    if (td.headerPath != "")
+    {
+        try
+        {
+            FunctionParser fparser(td.headerPath);
+            fparser.parse();
+            int argnum = fparser.getArgumentCount(td.func, td.maxVariadic);
+            for (size_t i{}; i < argnum; i++)
+            args.push_back("arg" + std::to_string(i));
+        } catch (const std::exception& e)
+        {
+            std::cerr << "Error: " << e.what() << std::endl;
+            return;
+        }
+    } else
+    {
+        args = findVars(td.trigger);
+    }
+
     for (const auto& arg : args) {
         argkeys += ", " + arg;
         samplerMapNames.push_back("@sampler" + std::to_string((int)id) + "_" + td.func + "_" + arg);

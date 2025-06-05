@@ -12,15 +12,16 @@ struct ArgumentInfo {
     bool isVariadic;
 };
 
-struct FunctionInfo {
-    std::string name;
-    std::vector<ArgumentInfo> arguments;
-};
-
 struct TypeDefinition {
     std::string name;
     std::vector<std::pair<std::string, std::string>> fields; // (type, name)
     std::vector<TypeDefinition> nested;
+};
+
+struct FunctionInfo {
+    std::string name;
+    std::vector<ArgumentInfo> arguments;
+    std::vector<TypeDefinition> usedTypes;
 };
 
 class FunctionParser {
@@ -30,6 +31,8 @@ public:
 
     std::vector<FunctionInfo> parse();
     std::vector<TypeDefinition> getCollectedTypes() const;
+    std::vector<FunctionInfo> getFunctions() const;
+    int getArgumentCount(const std::string& functionName, int maxVariadic = 0) const;
 
 private:
     static CXChildVisitResult visitor(CXCursor cursor, CXCursor parent, CXClientData clientData);

@@ -85,6 +85,7 @@
         "semaphore": "cpp",
         "span": "cpp",
         "valarray": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "unordered_set": "cpp"
     }
 }

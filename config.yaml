@@ -7,16 +7,15 @@ TraceCondition:
   Targets:
   - FilePath: /lib/x86_64-linux-gnu/libc.so.6
     HeaderPath: /usr/include/x86_64-linux-gnu/sys/ioctl.h
-    MaxVariadic: 10
     Functions:
       - Func: ioctl
         HookType: uprobe
         StoreRetval: True
+        MaxVariadic: 3
         Triggers:
           - arg1 == 0x541c
           - auto arg0 arg1
   - FilePath: /lib/x86_64-linux-gnu/libcrypto.so.3
-    HeaderPath: ...
     Functions:
       - Func: EVP_EncryptUpdate
         HookType: uprobe

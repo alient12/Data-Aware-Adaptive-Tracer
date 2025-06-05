@@ -3,6 +3,7 @@
 
 #include "yaml_reader.hpp"
 #include "distribution.hpp"
+#include "function_parser.hpp"
 #include <string>
 #include <vector>
 #include <set>
