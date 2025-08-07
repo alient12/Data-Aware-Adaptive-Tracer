@@ -1,0 +1,17 @@
+TraceCondition:
+  #Command: printf "4\nn\n" | phoronix-test-suite benchmark openssl-3.3.0
+  Command: ""
+  Sudo: True
+  NoExec: False
+  LogsDir: ./tracer_logs_openssl
+  ScriptPath: ./script.bt
+  Targets:
+  - FilePath: /home/alient/.phoronix-test-suite/installed-tests/pts/openssl-3.3.0/openssl-3.3.0/libcrypto.so.3
+    HeaderPath: /home/alient/.phoronix-test-suite/installed-tests/pts/openssl-3.3.0/openssl-3.3.0/include/openssl/evp.h
+    Functions:
+      - Func: EVP_EncryptUpdate
+        HookType: uprobe
+        StoreRetval: True
+        MaxVariadic: 3
+        Triggers:
+          - arg4 >= 64 && arg4 <= 1024

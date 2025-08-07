@@ -167,7 +167,7 @@ void Tracer::generate_script()
     script += ind4 + "if (" + triggerScript +  ")\n";
     script += ind4 + "{\n";
 
-    script += ind8 + "printf(\"" + td.filePath + ":" + td.func + ":" + td.trigger + ", Comm: \%s, PID: \%d\\n\"" + ", comm, pid);\n";
+    // script += ind8 + "printf(\"" + td.filePath + ":" + td.func + ":" + td.trigger + ", Comm: \%s, PID: \%d\\n\"" + ", comm, pid);\n";
     script += ind8 + "$t = nsecs(monotonic);\n";
     script += ind8 + countMapName + "[comm, pid, tid" + argkeys + "] = count();\n";
     script += ind8 + stackMapName + "[comm, pid, tid, $t" + argkeys + "] = ustack;\n";
